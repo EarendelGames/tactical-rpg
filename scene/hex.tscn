@@ -1,0 +1,65 @@
+[gd_scene load_steps=7 format=4 uid="uid://ca6g4l2vsvxte"]
+
+[ext_resource type="Script" uid="uid://bonmls1y4r5gs" path="res://script/hex.gd" id="1_khich"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_djunl"]
+transparency = 1
+albedo_color = Color(0.011764706, 0.011764706, 0.011764706, 0.25490198)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_nmuh6"]
+_surfaces = [{
+"aabb": AABB(-0.008660254, -0.01, 0, 0.017320508, 0.02, 1e-05),
+"format": 34359742465,
+"index_count": 18,
+"index_data": PackedByteArray("BgAFAAAABgAEAAUABgAAAAEABgADAAQABgABAAIABgACAAMA"),
+"lods": [1e-10, PackedByteArray("AAABAAIAAAACAAMAAAADAAQAAAAEAAUA")],
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 7,
+"vertex_data": PackedByteArray("veMNvArXo7sAAAAAveMNvArXozsAAAAAAAAAAArXIzwAAAAAveMNPArXozsAAAAAveMNPArXo7sAAAAAAAAAAArXI7wAAAAAAAAAAAAAAAAAAAAA")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_khich"]
+resource_name = "Cylinder"
+_surfaces = [{
+"aabb": AABB(-0.008660254, -0.01, 0, 0.017320508, 0.02, 1e-05),
+"attribute_data": PackedByteArray("6NT/PgAAgD8ANno6AABAPwAyejoAAIA+5tT/PgAAAABaln8//P9/PlqWfz///z8/59T/Pv7//z7n1P8+/v//PujU/z4AAIA/ADZ6OgAAQD/m1P8+AAAAAFqWfz/8/38+"),
+"format": 34359742487,
+"index_count": 18,
+"index_data": PackedByteArray("BgAFAAAABgAEAAUABgACAAMABgABAAIABwAIAAkABwAKAAsA"),
+"lods": [1e-10, PackedByteArray("AAABAAIAAAACAAMAAAADAAQAAAAEAAUA")],
+"material": SubResource("StandardMaterial3D_djunl"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 12,
+"vertex_data": PackedByteArray("veMNvArXo7sAAAAAveMNvArXozsAAAAAAAAAAArXIzwAAAAAveMNPArXozsAAAAAveMNPArXo7sAAAAAAAAAAArXI7wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAveMNvArXo7sAAAAAveMNvArXozsAAAAAveMNPArXozsAAAAAveMNPArXo7sAAAAA/3//f9mubJf/f/9/2a5sl/9//3/ZrmyX/3//f9mubJf/f/9/2a5sl/9//3/ZrmyX/3//f9mubJf/f/9/2a5sl/9//3/ZrmyX/3//f9mubJf/f/9/2a5sl/9//3/ZrmyX")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_nmuh6")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k1ibq"]
+transparency = 1
+albedo_color = Color(0.4862745, 0.4862745, 0.4862745, 0.11372549)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_8ebx4"]
+points = PackedVector3Array(0, 0, -0.58, 0.501, 0, -0.289, 0.501, 0, 0.289, 0, 0, 0.58, -0.501, 0, 0.289, -0.501, 0, -0.289)
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_khich")
+
+[node name="Cylinder" type="MeshInstance3D" parent="."]
+transform = Transform3D(57.82, 0, 0, 0, -2.5273926e-06, 57.82, 0, -57.82, -2.5273926e-06, 0, 0, 0)
+mesh = SubResource("ArrayMesh_khich")
+skeleton = NodePath("")
+
+[node name="Cylinder2" type="MeshInstance3D" parent="."]
+transform = Transform3D(46.325, 0, 0, 0, -2.0249302e-06, 46.325, 0, -46.325, -2.0249302e-06, 0, 0.009013653, 0)
+material_override = SubResource("StandardMaterial3D_k1ibq")
+mesh = SubResource("ArrayMesh_khich")
+skeleton = NodePath("")
+
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("ConvexPolygonShape3D_8ebx4")
