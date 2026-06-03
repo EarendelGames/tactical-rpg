@@ -1,123 +1,124 @@
-[gd_scene load_steps=6 format=3 uid="uid://drcw6mu3pb4kc"]
+[gd_scene format=3 uid="uid://drcw6mu3pb4kc"]
 
 [ext_resource type="Script" uid="uid://c8jan13kkde12" path="res://script/grid_handler.gd" id="1_0xm2m"]
-[ext_resource type="Script" uid="uid://dk45wiejmkoci" path="res://script/initiative_manager.gd" id="1_brvut"]
+[ext_resource type="Script" uid="uid://dsnuq4nun5ly1" path="res://script/battle.gd" id="1_brvut"]
 [ext_resource type="PackedScene" uid="uid://ca6g4l2vsvxte" path="res://scene/hex.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://whoekke5oujs" path="res://scene/unit.tscn" id="3_wp4xf"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_brvut"]
 size = Vector2(5.37, 3.995)
 
-[node name="Node3D" type="Node3D"]
+[node name="Node3D" type="Node3D" unique_id=2137240322 node_paths=PackedStringArray("grid", "_button")]
 script = ExtResource("1_brvut")
-grid_handler = NodePath("GridHandler")
-end_turn_button = NodePath("Control/EndTurnButton")
+grid = NodePath("GridHandler")
+_button = NodePath("Control/EndTurnButton")
 
-[node name="GridHandler" type="Node3D" parent="."]
+[node name="GridHandler" type="Node3D" parent="." unique_id=885200250]
 script = ExtResource("1_0xm2m")
 
-[node name="Node3D2" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D2" parent="GridHandler" unique_id=144764561 instance=ExtResource("1_ig7tw")]
 
-[node name="Node3D7" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D7" parent="GridHandler" unique_id=303156330 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
 int_pos = Vector3i(1, 0, 0)
 
-[node name="Node3D8" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D8" parent="GridHandler" unique_id=593923897 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
 int_pos = Vector3i(-1, 0, 0)
 
-[node name="Node3D13" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D13" parent="GridHandler" unique_id=1073112580 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1, 0.8660254)
 int_pos = Vector3i(-2, 2, 1)
 
-[node name="Node3D21" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D21" parent="GridHandler" unique_id=109749442 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, 1.7320508)
 int_pos = Vector3i(-1, 2, 2)
 
-[node name="Node3D22" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D22" parent="GridHandler" unique_id=1384711721 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1.7320508)
 int_pos = Vector3i(1, 2, 2)
 
-[node name="Node3D23" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D23" parent="GridHandler" unique_id=1816134597 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1.7320508)
 int_pos = Vector3i(0, 2, 2)
 
-[node name="Node3D16" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D16" parent="GridHandler" unique_id=1398392616 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1, 0.8660254)
 int_pos = Vector3i(-3, 2, 1)
 
-[node name="Node3D14" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D14" parent="GridHandler" unique_id=126709502 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1.7320508)
 int_pos = Vector3i(-2, 0, -2)
 
-[node name="Node3D15" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D15" parent="GridHandler" unique_id=1927833747 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1.7320508)
 int_pos = Vector3i(-2, 0, -2)
 
-[node name="Node3D12" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D12" parent="GridHandler" unique_id=322285752 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
 int_pos = Vector3i(-2, 0, 0)
 
-[node name="Node3D17" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D17" parent="GridHandler" unique_id=868471926 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0)
 int_pos = Vector3i(-3, 0, 0)
 
-[node name="Node3D3" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D3" parent="GridHandler" unique_id=1153475214 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -0.8660254)
 int_pos = Vector3i(-1, 0, -1)
 
-[node name="Node3D4" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D4" parent="GridHandler" unique_id=94115189 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, -0.8660254)
 int_pos = Vector3i(0, 0, -1)
 
-[node name="Node3D5" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D5" parent="GridHandler" unique_id=1334557193 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0.8660254)
 int_pos = Vector3i(-1, 0, 1)
 
-[node name="Node3D6" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D6" parent="GridHandler" unique_id=884964631 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0.8660254)
 int_pos = Vector3i(0, 0, 1)
 
-[node name="Node3D9" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D9" parent="GridHandler" unique_id=954237685 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 0)
 int_pos = Vector3i(2, 1, 0)
 
-[node name="Node3D10" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D10" parent="GridHandler" unique_id=818829725 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0.5, -0.8660254)
 int_pos = Vector3i(1, 1, -1)
 
-[node name="Node3D11" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D11" parent="GridHandler" unique_id=404468915 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0.5, 0.8660254)
 int_pos = Vector3i(1, 1, 1)
 
-[node name="Node3D18" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D18" parent="GridHandler" unique_id=1314456585 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, 0)
 int_pos = Vector3i(3, 1, 0)
 
-[node name="Node3D19" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D19" parent="GridHandler" unique_id=1122583141 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.5, -0.8660254)
 int_pos = Vector3i(2, 1, -1)
 
-[node name="Node3D20" parent="GridHandler" instance=ExtResource("1_ig7tw")]
+[node name="Node3D20" parent="GridHandler" unique_id=1764220602 instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.5, 0.8660254)
 int_pos = Vector3i(2, 1, 1)
 
-[node name="Node3D" type="Node3D" parent="GridHandler"]
+[node name="Node3D" type="Node3D" parent="GridHandler" unique_id=372796174]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3592043, 1.4936442, 0)
 
-[node name="Units" type="Node3D" parent="."]
+[node name="Units" type="Node3D" parent="." unique_id=1588664837]
 
-[node name="Unit" parent="Units" instance=ExtResource("3_wp4xf")]
+[node name="Unit" parent="Units" unique_id=804548472 instance=ExtResource("3_wp4xf")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.010329366, 4.7683716e-07, 0.032955647)
-initiative_modifier = null
-movement_range = 2
 force = 0
-
-[node name="Unit2" parent="Units" instance=ExtResource("3_wp4xf")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.14256734, 0.99361753, 2.1949894)
+max_movement_points = 4
 movement_range = 2
 
-[node name="Control" type="Control" parent="."]
+[node name="Unit2" parent="Units" unique_id=2054687400 instance=ExtResource("3_wp4xf")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.14256734, 0.99361753, 2.1949894)
+max_movement_points = 4
+movement_range = 2
+
+[node name="Control" type="Control" parent="." unique_id=249114311]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -126,7 +127,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="EndTurnButton" type="Button" parent="Control"]
+[node name="EndTurnButton" type="Button" parent="Control" unique_id=852668650]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -139,12 +140,12 @@ grow_horizontal = 0
 grow_vertical = 0
 text = "End Turn"
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1331520449]
 transform = Transform3D(-1, 3.5527137e-15, 8.742278e-08, 6.84918e-08, 0.6214487, 0.78345484, -5.4328765e-08, 0.78345484, -0.6214487, 0, 2.0940223, -1.901153)
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=10836966]
 transform = Transform3D(-2.1321028e-08, 0.87297314, -0.48776826, 3.8158866e-08, 0.48776826, 0.87297314, 1, 0, -4.3711385e-08, -2.0137758, 2.2157712, 0.032955647)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1445747858]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0385046, 0)
 mesh = SubResource("PlaneMesh_brvut")
