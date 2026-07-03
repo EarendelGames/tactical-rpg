@@ -6,20 +6,24 @@ extends Node
 @export var _button: Button
 var units: Array[Unit] = []
 var current_unit_index: int = 0
-var current_tree: EventTree = null
+var sequence_tree: SequenceTree = null
 
 var _highlighted_cells: Array[HexCell] = []
 var _reachable_cells: Array[HexCell] = []
 var _move_mode: bool = false
+var sequence_timer: float = 0
 
 func _ready() -> void:
+	print("Battle ready")
 	_button.pressed.connect(_on_end_turn)
 	get_viewport().physics_object_picking = true
-	for unit in $Units.get_children():
+	for unit:Unit in $Units.get_children():
 		units.append(unit)
+		unit.battle = self
 	start_combat(units)
 
 func start_combat(unit_list: Array[Unit]) -> void:
+	print("Battle start_combat with units")
 	units = unit_list
 	for unit in units:
 		unit.initialise(self)
@@ -33,7 +37,7 @@ func start_combat(unit_list: Array[Unit]) -> void:
 	_begin_turn()
 
 func _begin_turn() -> void:
-	print("_begin_turn")
+	print("Battle _begin_turn")
 	var unit := units[current_unit_index]
 	if unit.is_dead:
 		_advance_turn()
@@ -42,11 +46,24 @@ func _begin_turn() -> void:
 	unit.turn_start(self)
 	_show_movement_options(unit)
 
+func _process(delta: float) -> void:
+	if not sequence_tree: return
+	sequence_timer += delta
+	if sequence_timer > 0.5:
+		sequence_timer = 0.0
+		print("Battle _process")
+		if not sequence_tree.process_next_action():
+			sequence_tree = null
+			_advance_turn()
+			
+
 # --- Movement ---
 
 func _show_movement_options(unit: Unit) -> void:
+	print("Battle _show_movement_options")
 	_clear_highlights()
 	_move_mode = true
+	print("Show options from ", unit.current_cell.int_pos)
 	_reachable_cells = grid.get_reachable_cells(unit.current_cell, unit.movement_range)
 	for cell in _reachable_cells:
 		cell.set_highlighted(true)
@@ -54,6 +71,7 @@ func _show_movement_options(unit: Unit) -> void:
 	_highlighted_cells = _reachable_cells.duplicate()
 
 func _on_move_cell_clicked(cell: HexCell) -> void:
+	print("Battle _on_move_cell_clicked")
 	if not _move_mode:
 		return
 	var unit := units[current_unit_index]
@@ -62,44 +80,37 @@ func _on_move_cell_clicked(cell: HexCell) -> void:
 	_execute_move(unit, cell)
 
 func _execute_move(unit: Unit, target_cell: HexCell) -> void:
-	var start_cell := unit.current_cell
-	var path := grid.find_path(start_cell, target_cell)
-	if path.size() <= 1:
-		return
-	path.remove_at(0)
-	current_tree = EventTree.new(unit, null, [])
-	current_tree.battle = self
-	MovementExecutor.execute(unit, path, current_tree, start_cell)
-	current_tree = null
+	print("Battle _execute_move")
+	activate_ability(unit.move_ability, {"target_cell" = target_cell})
+	
+func place_on_cell(unit:Unit, cell: HexCell) -> void:
+	var occupant = cell.occupant
+	var start_cell = unit.current_cell
+	unit.current_cell = cell
+	unit.global_position = cell.global_position
+	cell.occupant = unit
+	if start_cell:
+		start_cell.occupant = null
+	if occupant: # swap if occupied
+		print("Swap positions")
+		occupant.current_cell = start_cell
+		occupant.global_position = start_cell.global_position
+		start_cell.occupant = occupant
 
 # --- Ability activation ---
 
-func activate_ability(instance: AbilityInstance, resolved_inputs: Array) -> void:
-	var unit := units[current_unit_index]
-	if not instance.can_use(unit):
-		push_warning("Unit cannot use ability: %s" % instance.ability.name)
+func activate_ability(unit_ability: UnitAbility, resolved_inputs: Dictionary) -> void:
+	print("Battle activate_ability")
+	if sequence_tree != null:
+		push_warning("The current sequence tree must finish first")
 		return
-	instance.consume(unit)
-	current_tree = EventTree.new(unit, instance.ability, resolved_inputs)
-	current_tree.battle = self
-	instance.ability.execute(current_tree)
-	current_tree.resolve()
-	current_tree = null
-
-# --- Trigger notification ---
-
-func notify_damage_taken(
-	damaged_unit: Unit,
-	tree: EventTree,
-	parent_node: EventNode
-) -> void:
-	for unit in units:
-		if unit.is_dead or unit == damaged_unit:
-			continue
-		for trigger in unit.get_triggers_for_timing(BattleEnums.EventTiming.RESPONSE):
-			if trigger["cancel_if"].is_valid() and trigger["cancel_if"].call():
-				continue
-			trigger["callable"].call(tree, parent_node)
+	if not unit_ability.can_use():
+		push_warning("Unit cannot use ability: %s" % unit_ability.ability.name)
+		return
+	unit_ability.consume()
+	sequence_tree = SequenceTree.new(self, unit_ability, resolved_inputs)
+	sequence_tree.battle = self
+	unit_ability.ability.execute(unit_ability, resolved_inputs)
 
 # --- Turn management ---
 
@@ -125,7 +136,7 @@ func _assign_units_to_cells() -> void:
 	for unit in units:
 		var best_cell := _find_closest_open_cell(unit.global_position)
 		if best_cell:
-			unit.place_on_cell(best_cell)
+			place_on_cell(unit, best_cell)
 		else:
 			push_error("No open cell found for unit: " + unit.unit_name)
 

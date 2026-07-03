@@ -49,36 +49,36 @@ func on_expired(unit: Unit, instance: Instance, battle: Battle) -> void:
 	pass
 
 # --- Definitions ---
-
-class Oil extends StatusBase:
-	func _init() -> void:
-		super("oil", "Oil", "Flammable. Converts to fire stacks when hit by fire damage.")
-	func on_turn_start(unit: Unit, instance: Instance, _battle: Battle) -> void:
-		var fire_instance := unit.get_status("fire")
-		if fire_instance:
-			fire_instance.stacks += instance.stacks
-			unit.remove_status("oil")
-
-class Fire extends StatusBase:
-	func _init() -> void:
-		super("fire", "Fire", "Burns the unit each turn. Ignites oil on contact.")
-	func on_turn_start(unit: Unit, instance: Instance, _battle: Battle) -> void:
-		var oil_instance := unit.get_status("oil")
-		if oil_instance:
-			instance.stacks += oil_instance.stacks
-			unit.remove_status("oil")
-		var tree := EventTree.new(unit, null, [])
-		var node := EventNode.new(
-			BattleEnums.EventTiming.IMMEDIATE,
-			func(): unit.take_damage(float(instance.stacks), BattleEnums.DamageType.FIRE, tree, null)
-		)
-		tree.add_root_node(node)
-		tree.resolve()
-		instance.stacks -= 1
-		if instance.stacks <= 0:
-			unit.remove_status("fire")
-
-# --- Static instances — forces registration at load time ---
-
-static var _oil := Oil.new()
-static var _fire := Fire.new()
+#
+#class Oil extends StatusBase:
+	#func _init() -> void:
+		#super("oil", "Oil", "Flammable. Converts to fire stacks when hit by fire damage.")
+	#func on_turn_start(unit: Unit, instance: Instance, _battle: Battle) -> void:
+		#var fire_instance := unit.get_status("fire")
+		#if fire_instance:
+			#fire_instance.stacks += instance.stacks
+			#unit.remove_status("oil")
+#
+#class Fire extends StatusBase:
+	#func _init() -> void:
+		#super("fire", "Fire", "Burns the unit each turn. Ignites oil on contact.")
+	#func on_turn_start(unit: Unit, instance: Instance, _battle: Battle) -> void:
+		#var oil_instance := unit.get_status("oil")
+		#if oil_instance:
+			#instance.stacks += oil_instance.stacks
+			#unit.remove_status("oil")
+		#var tree := SequenceTree.new(null, null, [])
+		#var node := EventNode.new(
+			#BattleEnums.EventTiming.IMMEDIATE,
+			#func(): unit.take_damage(float(instance.stacks), BattleEnums.DamageType.FIRE, tree, null)
+		#)
+		#tree.add_root_node(node)
+		#tree.resolve()
+		#instance.stacks -= 1
+		#if instance.stacks <= 0:
+			#unit.remove_status("fire")
+#
+## --- Static instances — forces registration at load time ---
+#
+#static var _oil := Oil.new()
+#static var _fire := Fire.new()

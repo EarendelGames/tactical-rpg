@@ -1,0 +1,18 @@
+Unit / event / ability / trigger system.
+
+An event node is something that is happening / happened. It contained data about the event.
+An action node is something that will happen. It contains data about what to do. The action node may spawn event nodes.
+
+A unit starts an activity, usually from an ability.
+The ability has one or more events. So for example, a move attack would have the events:
+	Ability start, leave tile, enter tile, ... repeat leave-enter tile ... begin attack, attack hit or attack miss, damage unit, ability end. 
+This event chain is part of an event tree.
+Things with listeners can respond to these events. When they do so, they can inject additional events into the tree.
+Triggered events always happen after the triggering event, but by listening for an earlier events, they can cause their actions to happen before some of the triggeing event chain actions, e.g. respond to "begin_attack".
+Actions can be applied in sets, for example, fireball applying damage to multiple units at once. Triggers should therefore be able to respond to sets too.
+
+It's not always obvious how the tree should be expanded. Generally a new trigger effect should be added to the end of the stack. Cleary there are some things that are immediate, and some things that are sequential though.
+Immediate is added to the end of the sequental stack. After is added to the end of the tree. Insert would be after immediate effects, but before the next sequential stack, or in other words at the start of the sequential stack. 
+
+Perhaps the event tree can be described as Immediate (append only) and Sequence (append or prepend). 
+Anything in the immediate stack is always processed to clearance as soon as it is added, then the sequence stack is processed front to back. 

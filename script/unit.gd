@@ -23,16 +23,17 @@ var initiative: float = 0.0
 var current_cell: HexCell = null
 var is_dead: bool = false
 
-var abilities: Array[AbilityInstance] = []
+var move_ability: UnitAbility
+var abilities: Array[UnitAbility] = []
 var statuses: Array = []           # Array of StatusBase.Instance
-var ability_slots: Array[AbilityInstance] = []
+var ability_slots: Array[UnitAbility] = []
 
 # Triggers: { id, timing, callable, interruptible, cancel_if }
 var _triggers: Array = []
 # Setup triggers: { id, setup_event, callable, cancel_if }
 var _setup_triggers: Array = []
 
-var _battle: Battle = null
+var battle: Battle = null
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
@@ -40,18 +41,12 @@ func _ready() -> void:
 		mana = max_mana
 		movement_points = max_movement_points
 
-func initialise(battle: Battle) -> void:
-	_battle = battle
+func initialise(_battle: Battle) -> void:
+	battle = battle
+	move_ability = Abilities.basic_move.as_unit_ability(self)
 
 func roll_initiative() -> void:
 	initiative = randf_range(0.0, 10.0) + initiative_modifier
-
-func place_on_cell(cell: HexCell) -> void:
-	if current_cell:
-		current_cell.occupant = null
-	current_cell = cell
-	cell.occupant = self
-	global_position = cell.global_position
 
 func get_int_pos() -> Vector3i:
 	if current_cell:
@@ -69,8 +64,9 @@ func turn_start(battle: Battle) -> void:
 	_roll_ability_slots()
 
 func _reset_ability_uses() -> void:
-	for instance in abilities:
-		instance.reset_uses()
+	if move_ability: move_ability.reset_uses()
+	for unit_ability : UnitAbility in abilities:
+		unit_ability.reset_uses()
 
 func _tick_statuses(battle: Battle) -> void:
 	var snapshot := statuses.duplicate()
@@ -84,9 +80,9 @@ func _tick_statuses(battle: Battle) -> void:
 func _roll_ability_slots() -> void:
 	ability_slots.clear()
 	var available := abilities.duplicate()
-	var basics := available.filter(func(i: AbilityInstance): return i.ability.is_basic())
+	var basics := available.filter(func(i: UnitAbility): return i.ability.is_basic())
 	if basics.size() > 0:
-		var chosen: AbilityInstance = basics[randi() % basics.size()]
+		var chosen: UnitAbility = basics[randi() % basics.size()]
 		ability_slots.append(chosen)
 		available.erase(chosen)
 	available.shuffle()
@@ -178,36 +174,14 @@ func remove_status(id: String) -> void:
 func take_damage(
 	amount: float,
 	type: BattleEnums.DamageType,
-	tree: EventTree,
+	tree: SequenceTree,
 	parent_node: EventNode
 ) -> void:
-	if type == BattleEnums.DamageType.FIRE:
-		var oil := get_status("oil")
-		if oil:
-			var fire := get_status("fire")
-			var oil_stacks := oil.stacks
-			var node := EventNode.new(
-				BattleEnums.EventTiming.IMMEDIATE,
-				func():
-					if fire:
-						fire.stacks += oil_stacks
-					else:
-						apply_status("fire", oil_stacks)
-					remove_status("oil"),
-				self
-			)
-			if parent_node:
-				parent_node.add_child_node(node)
-			else:
-				tree.add_root_node(node)
 
 	health -= amount
 	print("%s took %.1f %s damage, %.1f health remaining" % [
 		unit_name, amount, BattleEnums.DamageType.keys()[type], health
 	])
-
-	if _battle and not is_dead:
-		_battle.notify_damage_taken(self, tree, parent_node)
 
 	if health <= 0.0:
 		_die(tree, parent_node)
@@ -215,7 +189,7 @@ func take_damage(
 func heal(amount: float) -> void:
 	health = minf(health + amount, max_health)
 
-func _die(_tree: EventTree, _parent_node: EventNode) -> void:
+func _die(_tree: SequenceTree, _parent_node: EventNode) -> void:
 	is_dead = true
 	if current_cell:
 		current_cell.occupant = null

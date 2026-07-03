@@ -1,11 +1,14 @@
 # ability_instance.gd
-class_name AbilityInstance
+class_name UnitAbility
+#This is an ability that exists on a character. It is not the "usage instace" of the ability - that's the sequence tree. 
 
+var unit:Unit # the owning unit
 var ability: AbilityBase
 var uses_remaining: int = 1
 
-func _init(p_ability: AbilityBase) -> void:
-	ability = p_ability
+func _init(_ability: AbilityBase, _unit:Unit) -> void:
+	ability = _ability
+	unit = _unit
 	reset_uses()
 
 func reset_uses() -> void:
@@ -14,7 +17,7 @@ func reset_uses() -> void:
 	else:
 		uses_remaining = -1  # sentinel for unlimited
 
-func can_use(unit: Unit) -> bool:
+func can_use() -> bool:
 	if ability.has_max_uses_per_turn and uses_remaining <= 0:
 		return false
 	if unit.mana < ability.cost_mana:
@@ -25,7 +28,7 @@ func can_use(unit: Unit) -> bool:
 		return false
 	return true
 
-func consume(unit: Unit) -> void:
+func consume() -> void:
 	if ability.has_max_uses_per_turn:
 		uses_remaining -= 1
 	unit.mana -= ability.cost_mana

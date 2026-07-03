@@ -114,10 +114,6 @@ func add_movement_trigger(callable: Callable) -> void:
 func remove_movement_trigger(callable: Callable) -> void:
 	_movement_triggers.erase(callable)
 
-func fire_movement_triggers(
-	tree: EventTree,
-	parent_node: EventNode,
-	moving_unit: Unit
-) -> void:
+func fire_movement_triggers(tree: SequenceTree, parent_node: EventNode, moving_unit: Unit) -> void:
 	for trigger in _movement_triggers:
 		trigger.call(tree, parent_node, moving_unit)

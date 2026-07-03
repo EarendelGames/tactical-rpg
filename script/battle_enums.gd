@@ -11,6 +11,8 @@ enum Tag {
 	ARCANE,
 	DEVOTION, # from a deity or something
 	
+	MOVEMENT, # Contains movemenet
+	
 	# DamageType
 	PHYSICAL,
 	FIRE,
