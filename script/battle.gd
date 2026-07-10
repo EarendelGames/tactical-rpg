@@ -1,6 +1,6 @@
 # battle/battle.gd
 class_name Battle
-extends Node
+extends Node3D
 
 @export var grid: GridHandler
 @export var _button: Button
@@ -49,7 +49,7 @@ func _begin_turn() -> void:
 func _process(delta: float) -> void:
 	if not sequence_tree: return
 	sequence_timer += delta
-	if sequence_timer > 0.5:
+	if sequence_timer > 0.1:
 		sequence_timer = 0.0
 		print("Battle _process")
 		if not sequence_tree.process_next_action():
@@ -82,7 +82,8 @@ func _on_move_cell_clicked(cell: HexCell) -> void:
 func _execute_move(unit: Unit, target_cell: HexCell) -> void:
 	print("Battle _execute_move")
 	activate_ability(unit.move_ability, {"target_cell" = target_cell})
-	
+
+
 func place_on_cell(unit:Unit, cell: HexCell) -> void:
 	var occupant = cell.occupant
 	var start_cell = unit.current_cell
@@ -96,7 +97,37 @@ func place_on_cell(unit:Unit, cell: HexCell) -> void:
 		occupant.current_cell = start_cell
 		occupant.global_position = start_cell.global_position
 		start_cell.occupant = occupant
-
+		
+func move_to_cell(unit:Unit, cell: HexCell) -> void:
+	var occupant = cell.occupant
+	var start_cell = unit.current_cell
+	unit.current_cell = cell
+	cell.occupant = unit
+	if start_cell:
+		start_cell.occupant = null
+		
+	#unit.global_position = cell.global_position
+	
+	var from = unit.global_position
+	var to = cell.global_position
+	var tween:Tween = get_tree().create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(unit, "global_position",to, 0.3).set_trans(Tween.TRANS_CUBIC)
+	tween.tween_property(unit, "rotation:y", wrapf(atan2(to.x - from.x, to.z - from.z), unit.rotation.y - PI, unit.rotation.y + PI), 0.2)
+	
+	if occupant: # swap if occupied
+		print("Swap positions")
+		occupant.current_cell = start_cell
+		start_cell.occupant = occupant
+		#occupant.global_position = start_cell.global_position
+		from = occupant.global_position
+		to = start_cell.global_position
+		tween.tween_property(occupant, "global_position", to, 0.3).set_trans(Tween.TRANS_CUBIC)
+		tween.tween_property(occupant, "rotation:y", wrapf(atan2(to.x - from.x, to.z - from.z), occupant.rotation.y - PI, occupant.rotation.y + PI), 0.2)
+	
+	sequence_timer -= 0.3
+	tween.play()
+		
 # --- Ability activation ---
 
 func activate_ability(unit_ability: UnitAbility, resolved_inputs: Dictionary) -> void:

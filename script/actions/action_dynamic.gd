@@ -7,10 +7,13 @@ extends ActionNode
 var _execute_function: Callable
 var _saved_data:Dictionary = {} # any daved data for later use.
 
-func _init(owning_ability:AbilityInstance, execute_function:Callable = Callable(), saved_data:Dictionary = {}) -> void:
+func _init(owning_ability:UnitAbility) -> void:
 	_owning_ability = owning_ability
+
+func with_function(execute_function:Callable = Callable(), saved_data:Dictionary = {}) -> ActionDynamic:
 	_execute_function = execute_function
 	_saved_data = saved_data
+	return self
 
 # Execute the current action.
 func execute(sequence_tree:SequenceTree) -> bool:

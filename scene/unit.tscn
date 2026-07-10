@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://whoekke5oujs"]
+[gd_scene format=3 uid="uid://whoekke5oujs"]
 
 [ext_resource type="Script" uid="uid://diiv74c3c22bq" path="res://script/unit.gd" id="1_jb630"]
 
@@ -16,23 +16,23 @@ size = Vector3(0.635, 0.34, 0.1)
 [sub_resource type="CylinderMesh" id="CylinderMesh_jb630"]
 height = 0.1
 
-[node name="Unit" type="Node3D"]
+[node name="Unit" type="Node3D" unique_id=37936411]
 script = ExtResource("1_jb630")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="."]
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1320281893]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47024244, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1407981240]
 shape = SubResource("CapsuleShape3D_jb630")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=813265404]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47024244, 0)
 mesh = SubResource("CapsuleMesh_5s1h1")
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=793098640]
 transform = Transform3D(0.5, 0, 0, 0, -2.1855694e-08, -0.5, 0, 0.5, -2.1855694e-08, 0, 0.031, 0.27830717)
 mesh = SubResource("PrismMesh_jb630")
 
-[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="." unique_id=1114376787]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.03141834, 0)
 mesh = SubResource("CylinderMesh_jb630")
