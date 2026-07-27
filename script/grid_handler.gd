@@ -100,8 +100,35 @@ func rebuild_pos_lookup() -> void:
 
 func get_cell_at(int_pos: Vector3i) -> HexCell:
 	return _pos_to_cell.get(int_pos, null)
-
 	
+
+# --- Distance ---
+
+func get_horizontal_distance(from: Vector2i, to: Vector2i) -> int:
+	@warning_ignore("integer_division")
+	var ax = from.x - ((from.y - (from.y & 1)) / 2)
+	var az = from.y
+	var ay = -ax - az
+
+	@warning_ignore("integer_division")
+	var bx = to.x - ((to.y - (to.y & 1)) / 2)
+	var bz = to.y
+	var by = -bx - bz
+
+	return max(
+		abs(ax - bx),
+		max(
+			abs(ay - by),
+			abs(az - bz)
+		)
+	)
+
+func get_cell_distance(from:Vector3i, to:Vector3i) -> int:
+	return get_horizontal_distance(
+		Vector2i(from.x, from.z),
+		Vector2i(to.x, to.z)
+	) + abs(from.y - to.y)
+
 # --- Neighbours ---
 
 func get_neighbours(cell: HexCell) -> Array[HexCell]:
@@ -109,7 +136,7 @@ func get_neighbours(cell: HexCell) -> Array[HexCell]:
 	var pos := cell.int_pos
 	var offsets := NEIGHBOUR_OFFSETS_ODD if (pos.z & 1) else NEIGHBOUR_OFFSETS_EVEN
 	for offset in offsets:
-		for dy in range(-4, 5):
+		for dy in range(-1, 2):
 			var candidate := Vector3i(pos.x + offset.x, pos.y + dy, pos.z + offset.y)
 			var neighbour := get_cell_at(candidate)
 			if neighbour:
@@ -165,8 +192,15 @@ func get_reachable_cells(from_cell: HexCell, range_steps: float, allow_occupied 
 	return reachable
 
 # --- Radius expansion ---
-
 func get_cells_in_radius(origin: HexCell, radius: float) -> Array[HexCell]:
+	var result: Array[HexCell] = []
+	for cell:HexCell in cells_array:
+		var dist = get_cell_distance(origin.int_pos, cell.int_pos)
+		if dist <= radius:
+			result.append(cell)
+	return result
+
+func get_cells_in_flood_radius(origin: HexCell, radius: float) -> Array[HexCell]:
 	var max_steps := int(radius)
 	var result: Array[HexCell] = []
 	var visited: Dictionary = {}
