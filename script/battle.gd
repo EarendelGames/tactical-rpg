@@ -44,6 +44,7 @@ func _begin_turn() -> void:
 		return
 	print("Turn: %s (initiative %.2f)" % [unit.unit_name, unit.initiative])
 	unit.turn_start(self)
+	# TODO: find primary movement ability and auto-select if for movement selection. 
 	_show_movement_options(unit)
 
 func _process(delta: float) -> void:
@@ -64,7 +65,7 @@ func _show_movement_options(unit: Unit) -> void:
 	_clear_highlights()
 	_move_mode = true
 	print("Show options from ", unit.current_cell.int_pos)
-	_reachable_cells = grid.get_reachable_cells(unit.current_cell, unit.movement_range)
+	_reachable_cells = grid.get_reachable_cells(unit.current_cell, unit.movement_range, false)
 	for cell in _reachable_cells:
 		cell.set_highlighted(true)
 		cell.cell_clicked.connect(_on_move_cell_clicked.bind(cell), CONNECT_ONE_SHOT)

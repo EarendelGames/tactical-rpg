@@ -11,7 +11,7 @@ static var basic_move := AbilityBase.new(
 	var start_cell := unit_ability.unit.current_cell
 	var target_cell : HexCell = input.target_cell
 	var battle = unit_ability.unit.battle
-	var path : Array[HexCell] = battle.grid.find_path(start_cell, target_cell)
+	var path : Array[HexCell] = battle.grid.find_path(start_cell, target_cell, false)
 	if path.size() <= 1:
 		return
 	path.remove_at(0)

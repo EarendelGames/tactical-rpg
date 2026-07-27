@@ -125,7 +125,7 @@ func _get_flat_neighbours(cell: HexCell) -> Array[HexCell]:
 
 # --- Reachability (BFS for movement) ---
 
-func get_reachable_cells(from_cell: HexCell, range_steps: float) -> Array[HexCell]:
+func get_reachable_cells(from_cell: HexCell, range_steps: float, allow_occupied = false) -> Array[HexCell]:
 	var reachable: Array[HexCell] = []
 	var visited: Dictionary = {}
 	var queue: Array = []
@@ -138,6 +138,8 @@ func get_reachable_cells(from_cell: HexCell, range_steps: float) -> Array[HexCel
 		var points: float = entry[1]
 
 		for neighbour in get_neighbours(cell):
+			if neighbour.occupant and not allow_occupied:
+				continue
 			if visited.has(neighbour.int_pos):
 				continue
 			if abs(neighbour.int_pos.y - cell.int_pos.y) > 1:
@@ -185,7 +187,7 @@ func get_cells_in_radius(origin: HexCell, radius: float) -> Array[HexCell]:
 
 # --- Pathfinding (A*) ---
 
-func find_path(from_cell: HexCell, to_cell: HexCell) -> Array[HexCell]:
+func find_path(from_cell: HexCell, to_cell: HexCell, allow_occupied:bool = false) -> Array[HexCell]:
 	if from_cell == to_cell:
 		return [from_cell]
 
@@ -211,6 +213,8 @@ func find_path(from_cell: HexCell, to_cell: HexCell) -> Array[HexCell]:
 
 		for neighbour in get_neighbours(current):
 			if abs(neighbour.int_pos.y - current.int_pos.y) > 1:
+				continue
+			if neighbour.occupant and not allow_occupied:
 				continue
 			var tentative_g: float = g_score.get(current.int_pos, INF) + 1.0
 			if tentative_g < g_score.get(neighbour.int_pos, INF):
