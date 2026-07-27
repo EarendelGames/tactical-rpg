@@ -73,32 +73,3 @@ enum SetupEvent {
 	PRE_MOVE,
 	PRE_ABILITY,
 }
-
-class AbilityInput:
-	var selection_type: SelectionType
-	var min_selections: int
-	var max_selections: int
-	var selection_range: float
-
-	func _init(
-		p_type: SelectionType,
-		p_range: float,
-		p_min: int = 1,
-		p_max: int = 1
-	) -> void:
-		selection_type = p_type
-		selection_range = p_range
-		min_selections = p_min
-		max_selections = p_max
-
-	static func cell(p_range: float, p_min: int = 1, p_max: int = 1) -> AbilityInput:
-		return AbilityInput.new(SelectionType.CELL, p_range, p_min, p_max)
-
-	static func unit(p_range: float, p_min: int = 1, p_max: int = 1) -> AbilityInput:
-		return AbilityInput.new(SelectionType.UNIT, p_range, p_min, p_max)
-
-	static func cell_corner(p_range: float, p_min: int = 1, p_max: int = 1) -> AbilityInput:
-		return AbilityInput.new(SelectionType.CELL_CORNER, p_range, p_min, p_max)
-
-	static func direction(p_range: float) -> AbilityInput:
-		return AbilityInput.new(SelectionType.DIRECTION, p_range)

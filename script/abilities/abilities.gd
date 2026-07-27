@@ -5,7 +5,7 @@ static var basic_move := AbilityBase.new(
 	"Move to a new tile",
 	[BattleEnums.Tag.MOVEMENT]
 ) \
-.input_cell(5.0) \
+.with_input(AbilityInput.cell(5.0, 1, 1, true, false)) \
 .with_execute(func(unit_ability:UnitAbility, input:Dictionary) -> void:
 	print("AbilityBase Move")
 	var start_cell := unit_ability.unit.current_cell

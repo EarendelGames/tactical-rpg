@@ -8,9 +8,6 @@ var units: Array[Unit] = []
 var current_unit_index: int = 0
 var sequence_tree: SequenceTree = null
 
-var _highlighted_cells: Array[HexCell] = []
-var _reachable_cells: Array[HexCell] = []
-var _move_mode: bool = false
 var sequence_timer: float = 0
 
 func _ready() -> void:
@@ -45,7 +42,7 @@ func _begin_turn() -> void:
 	print("Turn: %s (initiative %.2f)" % [unit.unit_name, unit.initiative])
 	unit.turn_start(self)
 	# TODO: find primary movement ability and auto-select if for movement selection. 
-	_show_movement_options(unit)
+	unit.move_ability.prep_for_input()
 
 func _process(delta: float) -> void:
 	if not sequence_tree: return
@@ -59,32 +56,6 @@ func _process(delta: float) -> void:
 			
 
 # --- Movement ---
-
-func _show_movement_options(unit: Unit) -> void:
-	print("Battle _show_movement_options")
-	_clear_highlights()
-	_move_mode = true
-	print("Show options from ", unit.current_cell.int_pos)
-	_reachable_cells = grid.get_reachable_cells(unit.current_cell, unit.movement_range, false)
-	for cell in _reachable_cells:
-		cell.set_highlighted(true)
-		cell.cell_clicked.connect(_on_move_cell_clicked.bind(cell), CONNECT_ONE_SHOT)
-	_highlighted_cells = _reachable_cells.duplicate()
-
-func _on_move_cell_clicked(cell: HexCell) -> void:
-	print("Battle _on_move_cell_clicked")
-	if not _move_mode:
-		return
-	var unit := units[current_unit_index]
-	_clear_highlights()
-	_move_mode = false
-	_execute_move(unit, cell)
-
-func _execute_move(unit: Unit, target_cell: HexCell) -> void:
-	print("Battle _execute_move")
-	activate_ability(unit.move_ability, {"target_cell" = target_cell})
-
-
 func place_on_cell(unit:Unit, cell: HexCell) -> void:
 	var occupant = cell.occupant
 	var start_cell = unit.current_cell
@@ -128,39 +99,21 @@ func move_to_cell(unit:Unit, cell: HexCell) -> void:
 	
 	sequence_timer -= 0.3
 	tween.play()
-		
-# --- Ability activation ---
 
-func activate_ability(unit_ability: UnitAbility, resolved_inputs: Dictionary) -> void:
-	print("Battle activate_ability")
-	if sequence_tree != null:
-		push_warning("The current sequence tree must finish first")
-		return
-	if not unit_ability.can_use():
-		push_warning("Unit cannot use ability: %s" % unit_ability.ability.name)
-		return
-	unit_ability.consume()
-	sequence_tree = SequenceTree.new(self, unit_ability, resolved_inputs)
-	sequence_tree.battle = self
-	unit_ability.ability.execute(unit_ability, resolved_inputs)
 
 # --- Turn management ---
 
 func _on_end_turn() -> void:
-	_clear_highlights()
+	clear_highlights()
 	_advance_turn()
 
 func _advance_turn() -> void:
 	current_unit_index = (current_unit_index + 1) % units.size()
 	_begin_turn()
 
-func _clear_highlights() -> void:
-	for cell in _highlighted_cells:
+func clear_highlights() -> void:
+	for cell:HexCell in grid.cells_array:
 		cell.set_highlighted(false)
-		if cell.cell_clicked.is_connected(_on_move_cell_clicked):
-			cell.cell_clicked.disconnect(_on_move_cell_clicked)
-	_highlighted_cells.clear()
-	_reachable_cells.clear()
 
 # --- Setup ---
 

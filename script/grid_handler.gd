@@ -28,6 +28,7 @@ const NEIGHBOUR_OFFSETS_ODD: Array[Vector2i] = [
 var _cells: Dictionary = {}
 # Flat lookup from Vector3i int_pos to HexCell, built at runtime
 var _pos_to_cell: Dictionary = {}
+var cells_array: Array[HexCell]
 
 # --- Registration ---
 
@@ -90,14 +91,17 @@ func _update_all_cells() -> void:
 
 func rebuild_pos_lookup() -> void:
 	_pos_to_cell.clear()
+	cells_array.clear()
 	for child in get_children():
 		var cell := child as HexCell
 		if cell:
 			_pos_to_cell[cell.int_pos] = cell
+			cells_array.append(cell)
 
 func get_cell_at(int_pos: Vector3i) -> HexCell:
 	return _pos_to_cell.get(int_pos, null)
 
+	
 # --- Neighbours ---
 
 func get_neighbours(cell: HexCell) -> Array[HexCell]:
@@ -112,7 +116,7 @@ func get_neighbours(cell: HexCell) -> Array[HexCell]:
 				neighbours.append(neighbour)
 	return neighbours
 
-func _get_flat_neighbours(cell: HexCell) -> Array[HexCell]:
+func get_flat_neighbours(cell: HexCell) -> Array[HexCell]:
 	var neighbours: Array[HexCell] = []
 	var pos := cell.int_pos
 	var offsets := NEIGHBOUR_OFFSETS_ODD if (pos.z & 1) else NEIGHBOUR_OFFSETS_EVEN
@@ -143,8 +147,6 @@ func get_reachable_cells(from_cell: HexCell, range_steps: float, allow_occupied 
 			if visited.has(neighbour.int_pos):
 				continue
 			if abs(neighbour.int_pos.y - cell.int_pos.y) > 1:
-				continue
-			if neighbour.occupant != null:
 				continue
 			var cost: float = neighbour.movement_cost
 			var is_adjacent_to_start := cell == from_cell
@@ -178,7 +180,7 @@ func get_cells_in_radius(origin: HexCell, radius: float) -> Array[HexCell]:
 		result.append(cell)
 		if dist >= max_steps:
 			continue
-		for neighbour in _get_flat_neighbours(cell):
+		for neighbour in get_neighbours(cell):
 			if not visited.has(neighbour.int_pos):
 				visited[neighbour.int_pos] = true
 				queue.append([neighbour, dist + 1])

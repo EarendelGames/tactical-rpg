@@ -18,7 +18,7 @@ var id: String
 var name: String
 var description: String
 var tags: Array[BattleEnums.Tag]
-var inputs: Array[BattleEnums.AbilityInput]
+var inputs: Array[AbilityInput]
 
 var cost_mana: float = 0.0
 var cost_movement: float = 0.0
@@ -48,20 +48,8 @@ func _init(
 
 # --- Builder methods ---
 
-func input_cell(input_range: float, p_min: int = 1, p_max: int = 1) -> AbilityBase:
-	inputs.append(BattleEnums.AbilityInput.cell(input_range, p_min, p_max))
-	return self
-
-func input_unit(input_range: float, p_min: int = 1, p_max: int = 1) -> AbilityBase:
-	inputs.append(BattleEnums.AbilityInput.unit(input_range, p_min, p_max))
-	return self
-
-func input_cell_corner(input_range: float, p_min: int = 1, p_max: int = 1) -> AbilityBase:
-	inputs.append(BattleEnums.AbilityInput.cell_corner(input_range, p_min, p_max))
-	return self
-
-func input_direction(input_range: float) -> AbilityBase:
-	inputs.append(BattleEnums.AbilityInput.direction(input_range))
+func with_input(input:AbilityInput) -> AbilityBase:
+	inputs.append(input)
 	return self
 
 func mana(amount: float) -> AbilityBase:
