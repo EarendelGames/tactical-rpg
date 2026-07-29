@@ -2,8 +2,12 @@
 class_name Battle
 extends Node3D
 
-@export var grid: GridHandler
-@export var _button: Button
+@onready var grid: GridHandler = $GridHandler
+
+@onready var end_turn_button: Button = $"Battle UI/BR/EndTurnButton"
+@onready var move_button: Button = $"Battle UI/BL/HBoxContainer/Move"
+@onready var main_action_button: Button = $"Battle UI/BL/HBoxContainer/Main"
+
 var units: Array[Unit] = []
 var current_unit_index: int = 0
 var sequence_tree: SequenceTree = null
@@ -12,7 +16,9 @@ var sequence_timer: float = 0
 
 func _ready() -> void:
 	print("Battle ready")
-	_button.pressed.connect(_on_end_turn)
+	end_turn_button.pressed.connect(_on_end_turn)
+	move_button.pressed.connect(_on_move_button)
+	main_action_button.pressed.connect(_on_main_button)
 	get_viewport().physics_object_picking = true
 	for unit:Unit in $Units.get_children():
 		units.append(unit)
@@ -41,13 +47,12 @@ func _begin_turn() -> void:
 		return
 	print("Turn: %s (initiative %.2f)" % [unit.unit_name, unit.initiative])
 	unit.turn_start(self)
-	# TODO: find primary movement ability and auto-select if for movement selection. 
-	unit.move_ability.prep_for_input()
+	#unit.move_ability.prep_for_input()
 
 func _process(delta: float) -> void:
 	if not sequence_tree: return
 	sequence_timer += delta
-	if sequence_timer > 0.1:
+	if sequence_timer > 0.0:
 		sequence_timer = 0.0
 		print("Battle _process")
 		if not sequence_tree.process_next_action():
@@ -80,12 +85,13 @@ func move_to_cell(unit:Unit, cell: HexCell) -> void:
 		
 	#unit.global_position = cell.global_position
 	
+	var delay := 0.3
 	var from = unit.global_position
 	var to = cell.global_position
 	var tween:Tween = get_tree().create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(unit, "global_position",to, 0.3).set_trans(Tween.TRANS_CUBIC)
-	tween.tween_property(unit, "rotation:y", wrapf(atan2(to.x - from.x, to.z - from.z), unit.rotation.y - PI, unit.rotation.y + PI), 0.2)
+	tween.tween_property(unit, "global_position",to, delay).set_custom_interpolator(Easing.in_out_faint)
+	tween.tween_property(unit, "rotation:y", wrapf(atan2(to.x - from.x, to.z - from.z), unit.rotation.y - PI, unit.rotation.y + PI), 0.5 * delay)
 	
 	if occupant: # swap if occupied
 		print("Swap positions")
@@ -94,10 +100,10 @@ func move_to_cell(unit:Unit, cell: HexCell) -> void:
 		#occupant.global_position = start_cell.global_position
 		from = occupant.global_position
 		to = start_cell.global_position
-		tween.tween_property(occupant, "global_position", to, 0.3).set_trans(Tween.TRANS_CUBIC)
-		tween.tween_property(occupant, "rotation:y", wrapf(atan2(to.x - from.x, to.z - from.z), occupant.rotation.y - PI, occupant.rotation.y + PI), 0.2)
+		tween.tween_property(occupant, "global_position", to, delay).set_custom_interpolator(Easing.in_out_faint)
+		tween.tween_property(occupant, "rotation:y", wrapf(atan2(to.x - from.x, to.z - from.z), occupant.rotation.y - PI, occupant.rotation.y + PI), 0.5 * delay)
 	
-	sequence_timer -= 0.3
+	sequence_timer -= delay
 	tween.play()
 
 
@@ -106,6 +112,16 @@ func move_to_cell(unit:Unit, cell: HexCell) -> void:
 func _on_end_turn() -> void:
 	clear_highlights()
 	_advance_turn()
+	
+func _on_move_button() -> void:
+	clear_highlights()
+	var unit := units[current_unit_index]
+	unit.move_ability.prep_for_input()
+
+func _on_main_button() -> void:
+	clear_highlights()
+	var unit := units[current_unit_index]
+	unit.abilities[0].prep_for_input()
 
 func _advance_turn() -> void:
 	current_unit_index = (current_unit_index + 1) % units.size()
@@ -139,3 +155,7 @@ func _find_closest_open_cell(world_pos: Vector3) -> HexCell:
 			best_dist = dist
 			best_cell = cell
 	return best_cell
+
+func new_sequence_tree(unit_ability:UnitAbility, inputs:Dictionary) -> SequenceTree:
+	sequence_tree = SequenceTree.new(self, unit_ability, inputs)
+	return sequence_tree

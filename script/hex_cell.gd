@@ -24,9 +24,6 @@ var _movement_triggers: Array = []
 signal cell_clicked(cell: HexCell)
 
 func _ready() -> void:
-	_invalid_material = StandardMaterial3D.new()
-	_invalid_material.albedo_color = Color(1.0, 0.0, 0.0, 0.5)
-	_invalid_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_highlight_material = StandardMaterial3D.new()
 	_highlight_material.albedo_color = Color(0.2, 0.6, 1.0, 0.5)
 	_highlight_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -82,17 +79,19 @@ func update_from_int_pos() -> void:
 # --- Materials ---
 
 func set_invalid(invalid: bool) -> void:
-	_apply_material_overrides(invalid)
+	if invalid:
+		set_highlighted(true, Color(1.0, 0.0, 0.0, 0.5))
+	else:
+		set_highlighted(false)
 
-func set_highlighted(highlighted: bool) -> void:
+func set_highlighted(highlighted: bool, color: Color = Color(0.2, 0.6, 1.0, 0.5)) -> void:
 	_highlighted = highlighted
-	_apply_material_overrides()
+	_apply_material_overrides(color)
 
-func _apply_material_overrides(force_invalid: bool = false) -> void:
+func _apply_material_overrides(color: Color) -> void:
 	var mat: StandardMaterial3D = null
-	if force_invalid:
-		mat = _invalid_material
-	elif _highlighted:
+	if _highlighted:
+		_highlight_material.albedo_color = color
 		mat = _highlight_material
 	for child in get_children():
 		if child is MeshInstance3D:

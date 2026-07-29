@@ -18,3 +18,12 @@ config/name="LSSF-hex"
 run/main_scene="uid://drcw6mu3pb4kc"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=2048
+window/size/viewport_height=1536
+
+[gui]
+
+theme/custom="uid://cag3860weie5m"

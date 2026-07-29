@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://ns8p03grwdmp"]
+
+[node name="BattleUi" type="Control" unique_id=665541667]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EndTurnButton" type="Button" parent="." unique_id=1324110470]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -78.0
+offset_top = -31.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "End Turn"

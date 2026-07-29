@@ -17,5 +17,5 @@ func with_function(execute_function:Callable = Callable(), saved_data:Dictionary
 
 # Execute the current action.
 func execute(sequence_tree:SequenceTree) -> bool:
-	_execute_function.call(sequence_tree, _saved_data)
+	_execute_function.call(sequence_tree, self, _saved_data)
 	return true

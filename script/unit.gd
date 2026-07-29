@@ -23,6 +23,10 @@ var initiative: float = 0.0
 var current_cell: HexCell = null
 var is_dead: bool = false
 
+var strength: float = 3.0
+var dexterity: float = 3.0
+var destruction: float = 3.0
+
 var move_ability: UnitAbility
 var abilities: Array[UnitAbility] = []
 var statuses: Array = []           # Array of StatusBase.Instance
@@ -44,6 +48,7 @@ func _ready() -> void:
 func initialise(_battle: Battle) -> void:
 	battle = battle
 	move_ability = Abilities.basic_move.as_unit_ability(self)
+	abilities.append(Abilities.basic_attack.as_unit_ability(self))
 
 func roll_initiative() -> void:
 	initiative = randf_range(0.0, 10.0) + initiative_modifier
@@ -55,8 +60,8 @@ func get_int_pos() -> Vector3i:
 
 # --- Turn start ---
 
-func turn_start(battle: Battle) -> void:
-	_tick_statuses(battle)
+func turn_start(_battle: Battle) -> void:
+	_tick_statuses(_battle)
 	if is_dead:
 		return
 	movement_points = max_movement_points
@@ -95,7 +100,7 @@ func _roll_ability_slots() -> void:
 
 func add_trigger(
 	id: String,
-	timing: BattleEnums.EventTiming,
+	timing: Type.EventTiming,
 	callable: Callable,
 	interruptible: bool = false,
 	cancel_if: Callable = Callable()
@@ -110,7 +115,7 @@ func add_trigger(
 
 func add_setup_trigger(
 	id: String,
-	setup_event: BattleEnums.SetupEvent,
+	setup_event: SetupEvent,
 	callable: Callable,
 	cancel_if: Callable = Callable()
 ) -> void:
@@ -133,10 +138,10 @@ func remove_trigger(id: String) -> void:
 			_setup_triggers.remove_at(i)
 		i -= 1
 
-func get_triggers_for_timing(timing: BattleEnums.EventTiming) -> Array:
+func get_triggers_for_timing(timing: Type.EventTiming) -> Array:
 	return _triggers.filter(func(t): return t["timing"] == timing)
 
-func get_triggers_for_setup_event(event: BattleEnums.SetupEvent) -> Array:
+func get_triggers_for_setup_event(event: SetupEvent) -> Array:
 	return _setup_triggers.filter(func(t): return t["setup_event"] == event)
 
 func register_ability_triggers(battle: Battle) -> void:
@@ -171,16 +176,16 @@ func remove_status(id: String) -> void:
 
 # --- Damage and death ---
 
-func take_damage(
+func apply_damage(
 	amount: float,
-	type: BattleEnums.DamageType,
+	type: Type.Damage,
 	tree: SequenceTree,
-	parent_node: EventNode
+	parent_node: ActionNode
 ) -> void:
 
 	health -= amount
 	print("%s took %.1f %s damage, %.1f health remaining" % [
-		unit_name, amount, BattleEnums.DamageType.keys()[type], health
+		unit_name, amount, type, health
 	])
 
 	if health <= 0.0:
@@ -189,7 +194,7 @@ func take_damage(
 func heal(amount: float) -> void:
 	health = minf(health + amount, max_health)
 
-func _die(_tree: SequenceTree, _parent_node: EventNode) -> void:
+func _die(_tree: SequenceTree, _parent_node: ActionNode) -> void:
 	is_dead = true
 	if current_cell:
 		current_cell.occupant = null
