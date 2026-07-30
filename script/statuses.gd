@@ -42,10 +42,10 @@ func _init(p_id: String, p_name: String, p_description: String) -> void:
 	description = p_description
 	StatusBase.register(self)
 
-func on_turn_start(unit: Unit, instance: Instance, battle: Battle) -> void:
+func on_turn_start(_unit: Unit, _instance: Instance) -> void:
 	pass
 
-func on_expired(unit: Unit, instance: Instance, battle: Battle) -> void:
+func on_expired(_unit: Unit, _instance: Instance) -> void:
 	pass
 
 # --- Definitions ---

@@ -35,7 +35,7 @@ func start_combat(unit_list: Array[Unit]) -> void:
 	grid.rebuild_pos_lookup()
 	_assign_units_to_cells()
 	for unit in units:
-		unit.register_ability_triggers(self)
+		unit.register_ability_triggers()
 	current_unit_index = 0
 	_begin_turn()
 
@@ -46,7 +46,7 @@ func _begin_turn() -> void:
 		_advance_turn()
 		return
 	print("Turn: %s (initiative %.2f)" % [unit.unit_name, unit.initiative])
-	unit.turn_start(self)
+	unit.turn_start()
 	#unit.move_ability.prep_for_input()
 
 func _process(delta: float) -> void:
@@ -57,7 +57,7 @@ func _process(delta: float) -> void:
 		print("Battle _process")
 		if not sequence_tree.process_next_action():
 			sequence_tree = null
-			_advance_turn()
+			#_advance_turn()
 			
 
 # --- Movement ---

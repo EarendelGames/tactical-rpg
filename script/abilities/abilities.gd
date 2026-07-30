@@ -5,7 +5,8 @@ static var basic_move := Ability.new(
 	"Move to a new tile",
 	[Ability.Tag.MOVEMENT]
 ) \
-.with_input(AbilityInput.cell(4.0, 1, 1, true, false)) \
+.uses_per_turn(false) \
+.with_input(AbilityInput.cell(func(ua: UnitAbility) -> float: return ua.unit.movement_points, 1, 1, 1, true, false)) \
 .with_execute(func(unit_ability:UnitAbility, input:Dictionary) -> void:
 	print("AbilityBase Move")
 	var start_cell := unit_ability.unit.current_cell
@@ -26,16 +27,16 @@ static var basic_attack := Ability.new(
 	"Attack a unit",
 	[Ability.Tag.BASIC, Ability.Tag.ATTACK, Ability.Tag.MELEE]
 ) \
-.with_input(AbilityInput.unit(1.0, 1, 1, false, true)) \
+.with_input(AbilityInput.unit(1.0, 1, 1, 1, false, true)) \
 .with_execute(func(unit_ability:UnitAbility, input:Dictionary) -> void:
 	print("AbilityBase Attack")
 	var battle = unit_ability.unit.battle
 	
 	var sequence_tree = battle.new_sequence_tree(unit_ability, input)
-	var action = ActionDynamic.new(unit_ability).with_function(func(sequence_tree:SequenceTree, current_node:ActionNode, _saved_data:Dictionary) -> void:
+	var action = ActionDynamic.new(unit_ability).with_function(func(_sequence_tree:SequenceTree, current_node:ActionNode, _saved_data:Dictionary) -> void:
 		#trigger attack start, etc, etc
 		var target_unit:Unit = _saved_data.target_unit
-		target_unit.apply_damage(unit_ability.unit.strength, Type.Damage.PHYSICAL, sequence_tree, current_node)
+		target_unit.apply_damage(unit_ability.unit.strength, Type.Damage.PHYSICAL, _sequence_tree, current_node)
 		return
 	, {target_unit = input.target_unit})
 	sequence_tree.append_sequential_action(action)

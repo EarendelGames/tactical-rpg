@@ -131,6 +131,6 @@ func execute(unit_ability:UnitAbility, input:Dictionary) -> void:
 	if _execute_fn.is_valid():
 		_execute_fn.call(unit_ability, input)
 
-func register_trigger(unit: Unit, battle: Battle) -> void:
+func register_trigger(unit: Unit) -> void:
 	if _trigger_fn.is_valid():
-		_trigger_fn.call(unit, battle)
+		_trigger_fn.call(unit)

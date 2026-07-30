@@ -36,24 +36,29 @@ func consume() -> void:
 	unit.health -= ability.cost_health
 
 func prep_for_input() -> void:
+	# consider moving to ability_input
 	var input_phase:AbilityInput = ability.inputs[0] #only consider the first phase for now
+	var selection_range = input_phase.get_selection_range(self)
+	var min_range = input_phase.get_min_range(self)
 	if input_phase.selection_type == Selection.Type.CELL:
 		var _reachable_cells: Array[HexCell]
 		if input_phase.require_path:
-			_reachable_cells = unit.battle.grid.get_reachable_cells(unit.current_cell, input_phase.selection_range, false)
+			_reachable_cells = unit.battle.grid.get_reachable_cells(unit.current_cell, selection_range, false)
 		else:
-			_reachable_cells = unit.battle.grid.get_cells_in_radius(unit.current_cell, input_phase.selection_range)
+			_reachable_cells = unit.battle.grid.get_cells_in_radius(unit.current_cell, selection_range, 1)
 		unit.battle.clear_highlights()
 		for cell:HexCell in _reachable_cells:
-			cell.set_highlighted(true)
-			cell.cell_clicked.connect(_on_cell_clicked.bind(cell), CONNECT_ONE_SHOT)
+			if GridHandler.get_cell_distance(unit.current_cell.int_pos, cell.int_pos) >= min_range:
+				cell.set_highlighted(true)
+				cell.cell_clicked.connect(_on_cell_clicked.bind(cell), CONNECT_ONE_SHOT)
 			
 	if input_phase.selection_type == Selection.Type.UNIT:
-		var _reachable_cells: Array[HexCell] = unit.battle.grid.get_cells_in_radius(unit.current_cell, input_phase.selection_range)
+		var _reachable_cells: Array[HexCell] = unit.battle.grid.get_cells_in_radius(unit.current_cell, selection_range, 1)
 		unit.battle.clear_highlights()
 		for cell:HexCell in _reachable_cells:
-			cell.set_highlighted(true, Color(1, 0, 0, 0.5))
-			cell.cell_clicked.connect(_on_unit_clicked.bind(cell), CONNECT_ONE_SHOT)
+			if GridHandler.get_cell_distance(unit.current_cell.int_pos, cell.int_pos) >= min_range:
+				cell.set_highlighted(true, Color(1, 0, 0, 0.5))
+				cell.cell_clicked.connect(_on_unit_clicked.bind(cell), CONNECT_ONE_SHOT)
 
 func _on_cell_clicked(cell: HexCell) -> void:
 	print("UnitAbility _on_cell_clicked")

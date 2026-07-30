@@ -10,8 +10,8 @@ enum Force { PLAYER, ENEMY, NEUTRAL }
 @export var force: Force = Force.ENEMY
 
 # Base stats
-@export var max_health: float = 100.0
-@export var max_mana: float = 50.0
+@export var max_health: float = 10.0
+@export var max_mana: float = 5.0
 @export var max_movement_points: float = 4
 @export var movement_range: float = 3
 
@@ -38,12 +38,18 @@ var _triggers: Array = []
 var _setup_triggers: Array = []
 
 var battle: Battle = null
+@onready var overhead_ui: OverheadUI = $OverheadUI
+
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
 		health = max_health
 		mana = max_mana
 		movement_points = max_movement_points
+		update_overhead_ui()
+
+func update_overhead_ui() -> void:
+	overhead_ui.find_child("Label").text = "Health %.0f" % [health]
 
 func initialise(_battle: Battle) -> void:
 	battle = battle
@@ -60,8 +66,8 @@ func get_int_pos() -> Vector3i:
 
 # --- Turn start ---
 
-func turn_start(_battle: Battle) -> void:
-	_tick_statuses(_battle)
+func turn_start() -> void:
+	_tick_statuses()
 	if is_dead:
 		return
 	movement_points = max_movement_points
@@ -73,12 +79,12 @@ func _reset_ability_uses() -> void:
 	for unit_ability : UnitAbility in abilities:
 		unit_ability.reset_uses()
 
-func _tick_statuses(battle: Battle) -> void:
+func _tick_statuses() -> void:
 	var snapshot := statuses.duplicate()
 	for instance in snapshot:
 		var status := StatusBase.get_status(instance.status_id)
 		if status:
-			status.on_turn_start(self, instance, battle)
+			status.on_turn_start(self, instance)
 		if is_dead:
 			return
 
@@ -144,9 +150,9 @@ func get_triggers_for_timing(timing: Type.EventTiming) -> Array:
 func get_triggers_for_setup_event(event: SetupEvent) -> Array:
 	return _setup_triggers.filter(func(t): return t["setup_event"] == event)
 
-func register_ability_triggers(battle: Battle) -> void:
+func register_ability_triggers() -> void:
 	for instance in abilities:
-		instance.ability.register_trigger(self, battle)
+		instance.ability.register_trigger(self)
 
 # --- Status management ---
 
@@ -187,12 +193,14 @@ func apply_damage(
 	print("%s took %.1f %s damage, %.1f health remaining" % [
 		unit_name, amount, type, health
 	])
+	update_overhead_ui()
 
 	if health <= 0.0:
 		_die(tree, parent_node)
 
 func heal(amount: float) -> void:
 	health = minf(health + amount, max_health)
+	update_overhead_ui()
 
 func _die(_tree: SequenceTree, _parent_node: ActionNode) -> void:
 	is_dead = true

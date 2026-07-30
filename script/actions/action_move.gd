@@ -12,4 +12,5 @@ func _init(owning_ability:UnitAbility, unit:Unit = null, to_cell:HexCell = null)
 func execute(_sequence_tree:SequenceTree) -> bool:
 	print("ActionMove execute_function")
 	_sequence_tree.battle.move_to_cell(_unit, _to_cell)
+	_unit.movement_points -= 1
 	return true

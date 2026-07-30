@@ -10,7 +10,6 @@ extends Node3D
 # Higher values require more movement points.
 @export var movement_cost: int = 1
 
-var _invalid_material: StandardMaterial3D
 var _highlight_material: StandardMaterial3D
 var _highlighted: bool = false
 var _grid_handler: GridHandler = null
