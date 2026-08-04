@@ -208,3 +208,8 @@ func _die(_tree: SequenceTree, _parent_node: ActionNode) -> void:
 		current_cell.occupant = null
 		current_cell = null
 	print("%s died" % unit_name)
+
+
+func activate_hover() -> void:
+	move_ability.hover_highlight()
+	

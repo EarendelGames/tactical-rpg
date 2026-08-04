@@ -10,8 +10,16 @@ extends Node3D
 # Higher values require more movement points.
 @export var movement_cost: int = 1
 
-var _highlight_material: StandardMaterial3D
+@onready var mesh_lower: MeshInstance3D = $MeshLower
+@onready var mesh_higher: MeshInstance3D = $MeshHigher
+@onready var area: Area3D = $Area3D
+
 var _highlighted: bool = false
+var _highlight_material: StandardMaterial3D
+
+var _hover_highlighted: bool = false
+var _hover_highlight_material: StandardMaterial3D
+
 var _grid_handler: GridHandler = null
 
 var occupant: Unit = null
@@ -21,11 +29,22 @@ var occupant: Unit = null
 var _movement_triggers: Array = []
 
 signal cell_clicked(cell: HexCell)
+signal mouse_entered(cell: HexCell)
+signal mouse_exited(cell: HexCell)
 
 func _ready() -> void:
+	
+	area.mouse_entered.connect(_on_mouse_entered)
+	area.mouse_exited.connect(_on_mouse_exited)
+	
 	_highlight_material = StandardMaterial3D.new()
 	_highlight_material.albedo_color = Color(0.2, 0.6, 1.0, 0.5)
 	_highlight_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	
+	_hover_highlight_material = StandardMaterial3D.new()
+	_hover_highlight_material.albedo_color = Color(0.2, 0.6, 1.0, 0.5)
+	_hover_highlight_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	
 	_find_grid_handler()
 	_register()
 	var body := find_child("Area3D")
@@ -85,17 +104,25 @@ func set_invalid(invalid: bool) -> void:
 
 func set_highlighted(highlighted: bool, color: Color = Color(0.2, 0.6, 1.0, 0.5)) -> void:
 	_highlighted = highlighted
-	_apply_material_overrides(color)
+	_apply_highlighted_material_overrides(color)
 
-func _apply_material_overrides(color: Color) -> void:
-	var mat: StandardMaterial3D = null
+func _apply_highlighted_material_overrides(color: Color) -> void:
 	if _highlighted:
 		_highlight_material.albedo_color = color
-		mat = _highlight_material
-	for child in get_children():
-		if child is MeshInstance3D:
-			child.material_override = mat
-			return
+		mesh_higher.material_override = _highlight_material
+	else:
+		mesh_higher.material_override = null
+		
+func set_hover_highlighted(highlighted: bool, color: Color = Color(0.6, 0.5, 0.1, 0.5)) -> void:
+	_hover_highlighted = highlighted
+	_apply_hover_highlighted_material_overrides(color)
+
+func _apply_hover_highlighted_material_overrides(color: Color) -> void:
+	if _hover_highlighted:
+		_hover_highlight_material.albedo_color = color
+		mesh_lower.material_override = _hover_highlight_material
+	else:
+		mesh_lower.material_override = null
 
 # --- Input ---
 
@@ -103,6 +130,14 @@ func _on_input_event(_camera, event, _pos, _normal, _shape_idx) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			cell_clicked.emit()
+
+func _on_mouse_entered() -> void:
+	mouse_entered.emit()
+	_grid_handler.set_hovered_cell(self)
+
+func _on_mouse_exited() -> void:
+	mouse_exited.emit()
+	_grid_handler.unset_hovered_cell(self)
 
 # --- Movement triggers ---
 

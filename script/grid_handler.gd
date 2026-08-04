@@ -29,6 +29,9 @@ var _cells: Dictionary = {}
 # Flat lookup from Vector3i int_pos to HexCell, built at runtime
 var _pos_to_cell: Dictionary = {}
 var cells_array: Array[HexCell]
+var _hovered_cell: HexCell
+
+signal hovered_cell_changed(cell: HexCell)
 
 # --- Registration ---
 
@@ -101,7 +104,22 @@ func rebuild_pos_lookup() -> void:
 func get_cell_at(int_pos: Vector3i) -> HexCell:
 	return _pos_to_cell.get(int_pos, null)
 	
-
+func set_hovered_cell(cell:HexCell) -> void:
+	_hovered_cell = cell
+	_on_hovered_cell_changed()
+	
+func unset_hovered_cell(cell:HexCell) -> void:
+	if _hovered_cell == cell:
+		_hovered_cell = null
+	_on_hovered_cell_changed()
+	
+func _on_hovered_cell_changed() -> void:
+	if _hovered_cell and _hovered_cell.occupant:
+		_hovered_cell.occupant.activate_hover()
+	else:
+		for cell in cells_array:
+			cell.set_hover_highlighted(false)
+	hovered_cell_changed.emit()
 
 # --- Neighbours ---
 

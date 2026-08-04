@@ -4,6 +4,8 @@
 [ext_resource type="Script" uid="uid://c8jan13kkde12" path="res://script/grid_handler.gd" id="2_ebedk"]
 [ext_resource type="PackedScene" uid="uid://ca6g4l2vsvxte" path="res://scene/hex.tscn" id="3_q27o7"]
 [ext_resource type="PackedScene" uid="uid://whoekke5oujs" path="res://scene/unit.tscn" id="4_6qw66"]
+[ext_resource type="Script" uid="uid://ecwh8j651v5m" path="res://script/camera_simple.gd" id="5_ebedk"]
+[ext_resource type="PackedScene" uid="uid://ns8p03grwdmp" path="res://scene/battle_ui.tscn" id="5_q27o7"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_brvut"]
 size = Vector2(5.37, 3.995)
@@ -25,8 +27,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
 int_pos = Vector3i(-1, 0, 0)
 
 [node name="Node3D13" parent="GridHandler" unique_id=1073112580 instance=ExtResource("3_q27o7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1, 0.8660254)
-int_pos = Vector3i(-2, 2, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.5, 0.8660254)
+int_pos = Vector3i(-2, 3, 1)
+
+[node name="Node3D39" parent="GridHandler" unique_id=1234296527 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.5, 1.7320508)
+int_pos = Vector3i(-2, 3, 2)
 
 [node name="Node3D21" parent="GridHandler" unique_id=109749442 instance=ExtResource("3_q27o7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, 1.7320508)
@@ -40,25 +46,97 @@ int_pos = Vector3i(1, 2, 2)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1.7320508)
 int_pos = Vector3i(0, 2, 2)
 
+[node name="Node3D30" parent="GridHandler" unique_id=1637840870 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 1.7320508)
+int_pos = Vector3i(2, 2, 2)
+
+[node name="Node3D31" parent="GridHandler" unique_id=1671008458 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, 1.7320508)
+int_pos = Vector3i(4, 2, 2)
+
+[node name="Node3D32" parent="GridHandler" unique_id=1717946608 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 1.7320508)
+int_pos = Vector3i(3, 2, 2)
+
+[node name="Node3D33" parent="GridHandler" unique_id=876965316 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1, 2.598076)
+int_pos = Vector3i(-2, 2, 3)
+
+[node name="Node3D45" parent="GridHandler" unique_id=916375432 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1, 2.598076)
+int_pos = Vector3i(-3, 2, 3)
+
+[node name="Node3D47" parent="GridHandler" unique_id=1562684251 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 1, 2.598076)
+int_pos = Vector3i(-4, 2, 3)
+
+[node name="Node3D46" parent="GridHandler" unique_id=453674538 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1, 1.7320508)
+int_pos = Vector3i(-4, 2, 2)
+
+[node name="Node3D34" parent="GridHandler" unique_id=1328903997 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, 2.598076)
+int_pos = Vector3i(0, 2, 3)
+
+[node name="Node3D35" parent="GridHandler" unique_id=1338290190 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, 2.598076)
+int_pos = Vector3i(-1, 2, 3)
+
+[node name="Node3D36" parent="GridHandler" unique_id=1901656961 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, 2.598076)
+int_pos = Vector3i(1, 2, 3)
+
+[node name="Node3D37" parent="GridHandler" unique_id=1987148943 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 1, 2.598076)
+int_pos = Vector3i(3, 2, 3)
+
+[node name="Node3D38" parent="GridHandler" unique_id=483660351 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1, 2.598076)
+int_pos = Vector3i(2, 2, 3)
+
 [node name="Node3D16" parent="GridHandler" unique_id=1398392616 instance=ExtResource("3_q27o7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1, 0.8660254)
-int_pos = Vector3i(-3, 2, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.5, 0.8660254)
+int_pos = Vector3i(-3, 3, 1)
 
 [node name="Node3D14" parent="GridHandler" unique_id=126709502 instance=ExtResource("3_q27o7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1.7320508)
 int_pos = Vector3i(-2, 0, -2)
 
 [node name="Node3D15" parent="GridHandler" unique_id=1927833747 instance=ExtResource("3_q27o7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1.7320508)
-int_pos = Vector3i(-2, 0, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -1.7320508)
+int_pos = Vector3i(-3, 0, -2)
+
+[node name="Node3D42" parent="GridHandler" unique_id=188181142 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, -0.8660254)
+int_pos = Vector3i(-4, 0, -1)
+
+[node name="Node3D40" parent="GridHandler" unique_id=22862532 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, -2.598076)
+int_pos = Vector3i(-3, 0, -3)
+
+[node name="Node3D41" parent="GridHandler" unique_id=1172891426 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, -2.598076)
+int_pos = Vector3i(-4, 0, -3)
 
 [node name="Node3D12" parent="GridHandler" unique_id=322285752 instance=ExtResource("3_q27o7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
 int_pos = Vector3i(-2, 0, 0)
 
+[node name="Node3D48" parent="GridHandler" unique_id=1600280976 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, 0.8660254)
+int_pos = Vector3i(-3, 0, 1)
+
 [node name="Node3D17" parent="GridHandler" unique_id=868471926 instance=ExtResource("3_q27o7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0)
 int_pos = Vector3i(-3, 0, 0)
+
+[node name="Node3D43" parent="GridHandler" unique_id=554855206 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.5, 0)
+int_pos = Vector3i(-4, 1, 0)
+
+[node name="Node3D44" parent="GridHandler" unique_id=614485866 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.5, 0.8660254)
+int_pos = Vector3i(-4, 1, 1)
 
 [node name="Node3D3" parent="GridHandler" unique_id=1153475214 instance=ExtResource("3_q27o7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -0.8660254)
@@ -100,8 +178,34 @@ int_pos = Vector3i(2, 1, -1)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.5, 0.8660254)
 int_pos = Vector3i(2, 1, 1)
 
+[node name="Node3D24" parent="GridHandler" unique_id=259423745 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.5, 0)
+int_pos = Vector3i(4, 1, 0)
+
+[node name="Node3D25" parent="GridHandler" unique_id=2068453066 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.5, -0.8660254)
+int_pos = Vector3i(3, 1, -1)
+
+[node name="Node3D26" parent="GridHandler" unique_id=1293021158 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.5, 0.8660254)
+int_pos = Vector3i(3, 1, 1)
+
+[node name="Node3D27" parent="GridHandler" unique_id=1534037101 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 0)
+int_pos = Vector3i(5, 1, 0)
+
+[node name="Node3D28" parent="GridHandler" unique_id=1662128202 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0.5, -0.8660254)
+int_pos = Vector3i(4, 1, -1)
+
+[node name="Node3D29" parent="GridHandler" unique_id=1615349982 instance=ExtResource("3_q27o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0.5, 0.8660254)
+int_pos = Vector3i(4, 1, 1)
+
 [node name="Node3D" type="Node3D" parent="GridHandler" unique_id=372796174]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3592043, 1.4936442, 0)
+
+[node name="BattleUI" parent="." unique_id=665541667 instance=ExtResource("5_q27o7")]
 
 [node name="Units" type="Node3D" parent="." unique_id=1588664837]
 
@@ -116,64 +220,13 @@ transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.14
 max_health = 10.0
 max_mana = 5.0
 
-[node name="Battle UI" type="Control" parent="." unique_id=1890823844]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="BR" type="MarginContainer" parent="Battle UI" unique_id=2025947450]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -98.0
-offset_top = -51.0
-grow_horizontal = 0
-grow_vertical = 0
-mouse_filter = 2
-
-[node name="EndTurnButton" type="Button" parent="Battle UI/BR" unique_id=867923583]
-layout_direction = 1
-layout_mode = 2
-text = "End Turn"
-
-[node name="BL" type="MarginContainer" parent="Battle UI" unique_id=1742408025]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -51.0
-offset_right = 122.0
-grow_vertical = 0
-mouse_filter = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Battle UI/BL" unique_id=400868940]
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Move" type="Button" parent="Battle UI/BL/HBoxContainer" unique_id=336230095]
-layout_direction = 1
-layout_mode = 2
-text = "Move"
-
-[node name="Main" type="Button" parent="Battle UI/BL/HBoxContainer" unique_id=587769484]
-layout_direction = 1
-layout_mode = 2
-text = "Main"
-
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1331520449]
-transform = Transform3D(-1, 3.5527137e-15, 8.742278e-08, 6.84918e-08, 0.6214487, 0.78345484, -5.4328765e-08, 0.78345484, -0.6214487, 0, 7.651968, -5.3574333)
-fov = 30.0
-
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=10836966]
 transform = Transform3D(-2.1321028e-08, 0.87297314, -0.48776826, 3.8158866e-08, 0.48776826, 0.87297314, 1, 0, -4.3711385e-08, -2.0137758, 2.2157712, 0.032955647)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1445747858]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0385046, 0)
 mesh = SubResource("PlaneMesh_brvut")
+
+[node name="CameraSimple" type="Camera3D" parent="." unique_id=1816686801]
+transform = Transform3D(-1, 0, 8.742278e-08, 6.985106e-08, 0.601327, 0.799003, -5.2569675e-08, 0.799003, -0.601327, 0, 4.4258413, -2.5929396)
+script = ExtResource("5_ebedk")

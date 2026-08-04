@@ -1,22 +1,77 @@
 [gd_scene format=3 uid="uid://ns8p03grwdmp"]
 
-[node name="BattleUi" type="Control" unique_id=665541667]
+[ext_resource type="Script" uid="uid://7q5wgw14chqa" path="res://script/ui/battle_ui.gd" id="1_rfcyq"]
+
+[node name="BattleUI" type="Control" unique_id=665541667]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_rfcyq")
 
-[node name="EndTurnButton" type="Button" parent="." unique_id=1324110470]
+[node name="BR" type="MarginContainer" parent="." unique_id=834705357]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -78.0
-offset_top = -31.0
+offset_left = -98.0
+offset_top = -51.0
 grow_horizontal = 0
 grow_vertical = 0
+mouse_filter = 2
+
+[node name="EndTurnButton" type="Button" parent="BR" unique_id=2136179655]
+unique_name_in_owner = true
+layout_direction = 1
+layout_mode = 2
 text = "End Turn"
+
+[node name="BL" type="MarginContainer" parent="." unique_id=1547394506]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -51.0
+offset_right = 128.0
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BL" unique_id=1667183351]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BL/VBoxContainer" unique_id=1961460774]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Movement" type="Button" parent="BL/VBoxContainer/HBoxContainer" unique_id=328815000]
+unique_name_in_owner = true
+layout_direction = 1
+layout_mode = 2
+text = "0"
+
+[node name="Health" type="Button" parent="BL/VBoxContainer/HBoxContainer" unique_id=861459660]
+unique_name_in_owner = true
+layout_direction = 1
+layout_mode = 2
+text = "10"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="BL/VBoxContainer" unique_id=959819758]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MoveAction" type="Button" parent="BL/VBoxContainer/HBoxContainer2" unique_id=1097398163]
+unique_name_in_owner = true
+layout_direction = 1
+layout_mode = 2
+text = "Move"
+
+[node name="MainAction" type="Button" parent="BL/VBoxContainer/HBoxContainer2" unique_id=1306603649]
+unique_name_in_owner = true
+layout_direction = 1
+layout_mode = 2
+text = "Main"
