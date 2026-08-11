@@ -7,17 +7,27 @@ extends Node3D
 var units: Array[Unit] = []
 var current_unit_index: int = 0
 var sequence_tree: SequenceTree = null
-
 var sequence_timer: float = 0
-@onready var battle_ui : BattleUI = $"BattleUI"
+@onready var battle_ui: BattleUI = $"BattleUI"
+var battle_sides: Dictionary = {} #String:Array[Unit] 
+var timeline: Timeline
+var _next_unit_id: int = 0; # Should be moved to a higher level.
 
+func next_unit_id() -> int:
+	_next_unit_id += 1
+	return _next_unit_id
+	
 func _ready() -> void:
 	print("Battle ready")
 	battle_ui.battle = self
+	timeline = Timeline.new()
 	get_viewport().physics_object_picking = true
 	for unit:Unit in $Units.get_children():
 		units.append(unit)
 		unit.battle = self
+	#TODO: Build sides from units.
+	for side_name in battle_sides:
+		timeline.register_side(battle_sides[side_name])
 	start_combat(units)
 
 func start_combat(unit_list: Array[Unit]) -> void:

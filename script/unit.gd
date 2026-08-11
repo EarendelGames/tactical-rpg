@@ -16,6 +16,7 @@ enum Force { PLAYER, ENEMY, NEUTRAL }
 @export var movement_range: float = 3
 
 # Runtime stats
+var unit_id: int = 0 # Unique unit id.
 var health: float = 0.0
 var mana: float = 0.0
 var movement_points: float = 0
@@ -53,6 +54,7 @@ func update_overhead_ui() -> void:
 
 func initialise(_battle: Battle) -> void:
 	battle = battle
+	unit_id = battle.next_unit_id()
 	move_ability = Abilities.basic_move.as_unit_ability(self)
 	abilities.append(Abilities.basic_attack.as_unit_ability(self))
 
