@@ -28,10 +28,6 @@ var occupant: Unit = null
 # Each entry is a Callable: (tree: EventTree, parent_node: EventNode, moving_unit: Unit) -> void
 var _movement_triggers: Array = []
 
-signal cell_clicked(cell: HexCell)
-signal mouse_entered(cell: HexCell)
-signal mouse_exited(cell: HexCell)
-
 func _ready() -> void:
 	
 	area.mouse_entered.connect(_on_mouse_entered)
@@ -126,17 +122,15 @@ func _apply_hover_highlighted_material_overrides(color: Color) -> void:
 
 # --- Input ---
 
-func _on_input_event(_camera, event, _pos, _normal, _shape_idx) -> void:
+func _on_input_event(_camera, event, pos, _normal, _shape_idx) -> void: # pos is world position
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			cell_clicked.emit()
+			_grid_handler.cell_clicked(self, pos, _normal)
 
 func _on_mouse_entered() -> void:
-	mouse_entered.emit()
 	_grid_handler.set_hovered_cell(self)
 
 func _on_mouse_exited() -> void:
-	mouse_exited.emit()
 	_grid_handler.unset_hovered_cell(self)
 
 # --- Movement triggers ---

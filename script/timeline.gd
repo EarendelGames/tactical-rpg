@@ -4,7 +4,7 @@ class_name Timeline
 const MIN_PREDICTED_ACTIONS: int = 10
 
 var world_time: float = 0.0
-var loop_positions: Dictionary  # side_name -> float
+var loop_positions: Dictionary  # side_enum -> float
 var waiting_units: Dictionary   # unit_id -> bool
 
 func _init() -> void:
@@ -19,7 +19,7 @@ func duplicate() -> Timeline:
 	return clone
 
 func register_side(side:BattleSide) -> void:
-	loop_positions[side.side_name] = 0.0
+	loop_positions[side.side_enum] = 0.0
 	for u in side.units:
 		waiting_units[u.unit_id] = false
 
@@ -34,13 +34,18 @@ static func get_side_speeds(battle: Battle, timeline: Timeline) -> Dictionary:
 	var side_participating_units: Dictionary = {}
 	var max_side_units: int = 0
 
-	for side_name: String in battle.battle_sides:
-		side_participating_units[side_name] = get_participating_units(battle.battle_sides[side_name], timeline)
-		max_side_units = max(max_side_units, side_participating_units[side_name])
+	for side_enum: BattleSide.Side in battle.battle_sides:
+		if side_enum == BattleSide.Side.NEUTRAL:
+			side_participating_units[side_enum] = 0 #Neutral units don't contribute to max.
+		else:
+			side_participating_units[side_enum] = get_participating_units(battle.battle_sides[side_enum], timeline)
+		max_side_units = max(max_side_units, side_participating_units[side_enum])
 
-	for side_name: String in battle.battle_sides:
-		var side: BattleSide = battle.battle_sides[side_name]
-		side_speeds[side_name] = pow(float(max_side_units) / float(side_participating_units[side_name]), 0.5)
+	for side_enum: BattleSide.Side in battle.battle_sides:
+		if side_enum == BattleSide.Side.NEUTRAL:
+			side_speeds[side_enum] = 1.0 # Neutral are always speed 1
+		else: 
+			side_speeds[side_enum] = pow(float(max_side_units) / float(side_participating_units[side_enum]), 0.5)
 
 	return side_speeds
 
@@ -70,16 +75,16 @@ static func _advance_timeline(battle: Battle, timeline: Timeline) -> TimelineEve
 	var side_speeds: Dictionary = get_side_speeds(battle, timeline)
 
 	var best_world_time: float = INF
-	var best_side_name: String = ""
+	var best_side_enum: BattleSide.Side = BattleSide.Side.NEUTRAL
 	var best_unit: Unit
 
-	for side_name: String in battle.battle_sides:
-		var side: BattleSide = battle.battle_sides[side_name]
+	for side_enum: BattleSide.Side in battle.battle_sides:
+		var side: BattleSide = battle.battle_sides[side_enum]
 		if side.units.is_empty():
 			continue
 
-		var side_speed: float = side_speeds[side_name]
-		var loop_pos: float = timeline.loop_positions[side_name]
+		var side_speed: float = side_speeds[side_enum]
+		var loop_pos: float = timeline.loop_positions[side_enum]
 		var side_size: int = side.units.size()
 
 		for i: int in range(side_size):
@@ -90,7 +95,7 @@ static func _advance_timeline(battle: Battle, timeline: Timeline) -> TimelineEve
 			var arrival: float = timeline.world_time + side_loop_dist / side_speed
 			if arrival < best_world_time:
 				best_world_time = arrival
-				best_side_name = side_name
+				best_side_enum = side_enum
 				best_unit = side.units[i]
 
 	# Check round boundary before next unit action
@@ -100,9 +105,9 @@ static func _advance_timeline(battle: Battle, timeline: Timeline) -> TimelineEve
 		return TimelineEvent.make_round_end(next_round_time)
 
 	# Advance winning side loop_pos
-	var loop_dist: float = (best_world_time - timeline.world_time) * side_speeds[best_side_name]
-	timeline.loop_positions[best_side_name] = fmod(
-		timeline.loop_positions[best_side_name] + loop_dist, 1.0
+	var loop_dist: float = (best_world_time - timeline.world_time) * side_speeds[best_side_enum]
+	timeline.loop_positions[best_side_enum] = fmod(
+		timeline.loop_positions[best_side_enum] + loop_dist, 1.0
 	)
 	timeline.world_time = best_world_time
 
@@ -112,7 +117,7 @@ static func _advance_timeline(battle: Battle, timeline: Timeline) -> TimelineEve
 
 	return TimelineEvent.make_action(
 		best_unit,
-		best_side_name,
+		best_side_enum,
 		best_world_time
 	)
 
@@ -150,7 +155,7 @@ static func get_predicted_timeline(battle: Battle) -> Array[TimelineEvent]:
 static func remove_unit(unit: Unit) -> void:
 	var battle: Battle = unit.battle
 	var side: BattleSide = unit.side
-	var side_name: String = side.name
+	var side_enum: String = side.name
 	var timeline: Timeline = battle.timeline
 
 	var unit_index: int = side.units.find(unit)
@@ -162,7 +167,7 @@ static func remove_unit(unit: Unit) -> void:
 
 	var side_size: int = side.units.size()
 	var unit_pos: float = get_unit_loop_position(unit_index, side_size)
-	var loop_pos: float = timeline.loop_positions[side_name]
+	var loop_pos: float = timeline.loop_positions[side_enum]
 
 	var loop_distance_to_unit: float = fmod(unit_pos - loop_pos + 1.0, 1.0)
 	var was_acting: bool = is_zero_approx(loop_distance_to_unit) \
@@ -172,11 +177,11 @@ static func remove_unit(unit: Unit) -> void:
 	var successor_index: int = (unit_index + 1) % side_size
 
 	side.units.remove_at(unit_index)
-	timeline.waiting_units[side_name].remove_at(unit_index)
+	timeline.waiting_units[side_enum].remove_at(unit_index)
 	var new_size: int = side.units.size()
 
 	if new_size == 0:
-		timeline.loop_positions[side_name] = 0.0
+		timeline.loop_positions[side_enum] = 0.0
 		return
 
 	if was_acting:
@@ -184,7 +189,7 @@ static func remove_unit(unit: Unit) -> void:
 			if predecessor_index < unit_index \
 			else predecessor_index - 1
 		predecessor_new_index = predecessor_new_index % new_size
-		timeline.loop_positions[side_name] = get_unit_loop_position(
+		timeline.loop_positions[side_enum] = get_unit_loop_position(
 			predecessor_new_index, new_size
 		)
 	else:
@@ -210,6 +215,6 @@ static func remove_unit(unit: Unit) -> void:
 		var successor_new_pos: float = get_unit_loop_position(successor_new_index, new_size)
 
 		var new_interval: float = fmod(successor_new_pos - predecessor_new_pos + 1.0, 1.0)
-		timeline.loop_positions[side_name] = fmod(
+		timeline.loop_positions[side_enum] = fmod(
 			predecessor_new_pos + progress_in_interval * new_interval, 1.0
 		)

@@ -14,6 +14,7 @@ enum Force { PLAYER, ENEMY, NEUTRAL }
 @export var max_mana: float = 5.0
 @export var max_movement_points: float = 4
 @export var movement_range: float = 3
+@export var side_enum: BattleSide.Side = BattleSide.Side.ENEMY
 
 # Runtime stats
 var unit_id: int = 0 # Unique unit id.

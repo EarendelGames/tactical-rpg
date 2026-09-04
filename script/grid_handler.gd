@@ -30,7 +30,7 @@ var _cells: Dictionary = {}
 var _pos_to_cell: Dictionary = {}
 var cells_array: Array[HexCell]
 var _hovered_cell: HexCell
-
+var battle: Battle
 signal hovered_cell_changed(cell: HexCell)
 
 # --- Registration ---
@@ -120,6 +120,9 @@ func _on_hovered_cell_changed() -> void:
 		for cell in cells_array:
 			cell.set_hover_highlighted(false)
 	hovered_cell_changed.emit()
+
+func cell_clicked(cell: HexCell, pos, normal) -> void:
+	battle.cell_clicked(cell, pos, normal)
 
 # --- Neighbours ---
 

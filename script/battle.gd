@@ -9,9 +9,10 @@ var current_unit_index: int = 0
 var sequence_tree: SequenceTree = null
 var sequence_timer: float = 0
 @onready var battle_ui: BattleUI = $"BattleUI"
-var battle_sides: Dictionary = {} #String:Array[Unit] 
+var battle_sides: Dictionary = {} #BattleSide.Side:Array[Unit] 
 var timeline: Timeline
 var _next_unit_id: int = 0; # Should be moved to a higher level.
+var input_consumer: UnitAbility = null
 
 func next_unit_id() -> int:
 	_next_unit_id += 1
@@ -19,16 +20,20 @@ func next_unit_id() -> int:
 	
 func _ready() -> void:
 	print("Battle ready")
+	grid.battle = self
 	battle_ui.battle = self
 	timeline = Timeline.new()
 	get_viewport().physics_object_picking = true
 	for unit:Unit in $Units.get_children():
 		units.append(unit)
 		unit.battle = self
-	#TODO: Build sides from units.
-	for side_name in battle_sides:
-		timeline.register_side(battle_sides[side_name])
+		if not battle_sides.has(unit.side_enum):
+			battle_sides[unit.side_enum] = BattleSide.new(unit.side_enum)
+		battle_sides[unit.side_enum].units.append(unit)
+	for side_enum in battle_sides:
+		timeline.register_side(battle_sides[side_enum])
 	start_combat(units)
+	#TODO: Use timeline for next unit instead of incrementing current_unit_index
 
 func start_combat(unit_list: Array[Unit]) -> void:
 	print("Battle start_combat with units")
@@ -129,6 +134,16 @@ func clear_highlights() -> void:
 func clear_hover_highlights() -> void:
 	for cell:HexCell in grid.cells_array:
 		cell.set_hover_highlighted(false)
+		
+func set_input_consumer(ua:UnitAbility) -> void:
+	input_consumer = ua
+	
+func cell_clicked(cell: HexCell, pos, normal) -> void:
+	if input_consumer:
+		print("a")
+		input_consumer.cell_clicked(cell, pos, normal)
+	else:
+		print("no input consumer")
 
 # --- Setup ---
 

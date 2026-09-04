@@ -5,6 +5,7 @@ class_name UnitAbility
 var unit:Unit # the owning unit
 var ability: Ability
 var uses_remaining: int = 1
+var valid_cells: Array[HexCell] = []
 
 func _init(_ability: Ability, _unit:Unit) -> void:
 	ability = _ability
@@ -36,19 +37,18 @@ func consume() -> void:
 	unit.health -= ability.cost_health
 
 func prep_for_input() -> void:
+	unit.battle.set_input_consumer(self)
+	
 	unit.battle.clear_highlights()
-	var reachable_cells = get_reachable_cells()
+	valid_cells = get_reachable_cells()
 	var input_phase:AbilityInput = ability.inputs[0] #only consider the first phase for now
 	
 	unit.battle.clear_highlights()
-	for cell:HexCell in reachable_cells:
+	for cell:HexCell in valid_cells:
 		if input_phase.selection_type == Selection.Type.CELL:
 			cell.set_highlighted(true)
-			cell.cell_clicked.connect(_on_cell_clicked.bind(cell), CONNECT_ONE_SHOT)
 		if input_phase.selection_type == Selection.Type.UNIT:
 			cell.set_highlighted(true, Color(1, 0, 0, 0.5))
-			cell.cell_clicked.connect(_on_unit_clicked.bind(cell), CONNECT_ONE_SHOT)
-	#TODO: Instead of connecting to signals, have the cells notify the battle of the click. The ability registers the input phase on the battle. The click is then injected into the input phase click handler.
 
 func hover_highlight() -> void:
 	var reachable_cells = get_reachable_cells()
@@ -85,23 +85,21 @@ func get_reachable_cells() -> Array[HexCell]:
 	return reachable_cells
 	
 
-func _on_cell_clicked(cell: HexCell) -> void:
+func cell_clicked(cell: HexCell, _pos, _normal) -> void:
 	print("UnitAbility _on_cell_clicked")
-	unit.battle.clear_highlights()
-	for clear_cell:HexCell in unit.battle.grid.cells_array:
-		if clear_cell.cell_clicked.is_connected(_on_cell_clicked):
-			clear_cell.cell_clicked.disconnect(_on_cell_clicked)
-	activate_ability({"target_cell" = cell})
+	if valid_cells.has(cell):
+		unit.battle.clear_highlights()
+		unit.battle.set_input_consumer(null)
+		activate_ability({"target_cell" = cell})
+	else:
+		print("invalid cell")
 	
-func _on_unit_clicked(cell: HexCell) -> void:
+func unit_clicked(cell: HexCell) -> void:
 	if not cell.occupant:
 		return
 	print("UnitAbility _on_unit_clicked")
 	unit.battle.clear_highlights()
-	for clear_cell:HexCell in unit.battle.grid.cells_array:
-		if clear_cell.cell_clicked.is_connected(_on_unit_clicked):
-			clear_cell.cell_clicked.disconnect(_on_unit_clicked)
-	
+	unit.battle.set_input_consumer(null)
 	activate_ability({"target_unit" = cell.occupant, "target_cell" = cell})
 
 func activate_ability(resolved_inputs: Dictionary) -> void:
