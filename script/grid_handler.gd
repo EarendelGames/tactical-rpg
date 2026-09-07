@@ -24,10 +24,11 @@ const NEIGHBOUR_OFFSETS_ODD: Array[Vector2i] = [
 	Vector2i(0, 1), Vector2i(0, -1),
 ]
 
-# Keyed by "ix,iy,iz", value is array of HexCells at that int position
+# Keyed by "ix,iy,iz", value is array of HexCells at that int position, iy is height
 var _cells: Dictionary = {}
 # Flat lookup from Vector3i int_pos to HexCell, built at runtime
 var _pos_to_cell: Dictionary = {}
+var cells_2d: Dictionary[Vector2i, Array] = {}
 var cells_array: Array[HexCell]
 var _hovered_cell: HexCell
 var battle: Battle
@@ -60,6 +61,8 @@ func _validate_key(key: String) -> void:
 func _pos_key(int_pos: Vector3i) -> String:
 	return "%d,%d,%d" % [int_pos.x, int_pos.y, int_pos.z]
 
+func pos_2d(int_pos: Vector3i) -> Vector2i:
+	return Vector2i(int_pos.x, int_pos.z)
 # --- Coordinate conversion ---
 
 func int_to_world(int_pos: Vector3i) -> Vector3:
@@ -92,13 +95,37 @@ func _update_all_cells() -> void:
 # --- Runtime lookup ---
 
 func rebuild_pos_lookup() -> void:
+	print("rebuild_pos_lookup")
 	_pos_to_cell.clear()
 	cells_array.clear()
+	cells_2d.clear()
+	
 	for child in get_children():
 		var cell := child as HexCell
 		if cell:
 			_pos_to_cell[cell.int_pos] = cell
 			cells_array.append(cell)
+			var pos2d := pos_2d(cell.int_pos)
+			if not cells_2d.has(pos2d):
+				cells_2d[pos2d] = []
+			cells_2d[pos2d].append(cell)
+
+	for cell in cells_array:
+		var pos2d := pos_2d(cell.int_pos)
+		var depth = -1
+		if cells_2d[pos2d].size() > 1:
+			for stack:HexCell in cells_2d[pos2d]:
+				if stack.int_pos.y < cell.int_pos.y:
+					depth = 1
+		if depth < 0:
+			depth = 1
+			var neighbours = get_neighbours_2d(cell)
+			for neighbour:HexCell in neighbours:
+				if neighbour.int_pos.y < cell.int_pos.y:
+					var diff = cell.int_pos.y - neighbour.int_pos.y
+					depth = max(depth, diff)
+		cell.set_depth(depth)
+	
 
 func get_cell_at(int_pos: Vector3i) -> HexCell:
 	return _pos_to_cell.get(int_pos, null)
@@ -124,12 +151,12 @@ func cell_clicked(cell: HexCell, pos, normal) -> void:
 
 # --- Neighbours ---
 
-func get_neighbours(cell: HexCell) -> Array[HexCell]:
+func get_neighbours(cell: HexCell, down: int = 1, up: int = 1) -> Array[HexCell]:
 	var neighbours: Array[HexCell] = []
 	var pos := cell.int_pos
 	var offsets := NEIGHBOUR_OFFSETS_ODD if (pos.z & 1) else NEIGHBOUR_OFFSETS_EVEN
 	for offset in offsets:
-		for dy in range(-1, 2):
+		for dy in range(-down, 1 + up):
 			var candidate := Vector3i(pos.x + offset.x, pos.y + dy, pos.z + offset.y)
 			var neighbour := get_cell_at(candidate)
 			if neighbour:
@@ -145,6 +172,18 @@ func get_flat_neighbours(cell: HexCell) -> Array[HexCell]:
 		var neighbour := get_cell_at(candidate)
 		if neighbour:
 			neighbours.append(neighbour)
+	return neighbours
+	
+func get_neighbours_2d(cell: HexCell) -> Array[HexCell]:
+	var neighbours: Array[HexCell] = []
+	var pos := cell.int_pos
+	var pos2d := pos_2d(pos)
+	var offsets := NEIGHBOUR_OFFSETS_ODD if (pos.z & 1) else NEIGHBOUR_OFFSETS_EVEN
+	for offset in offsets:
+		var candidate := pos2d + offset
+		if cells_2d.has(candidate):
+			for neighbour in cells_2d[candidate]:
+				neighbours.append(neighbour)
 	return neighbours
 
 # --- Reachability (BFS for movement) ---

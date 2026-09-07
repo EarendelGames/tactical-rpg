@@ -13,6 +13,7 @@ extends Node3D
 @onready var mesh_lower: MeshInstance3D = $MeshLower
 @onready var mesh_higher: MeshInstance3D = $MeshHigher
 @onready var area: Area3D = $Area3D
+@onready var shape: HexShape3D = $Area3D/HexShape3D
 
 var _highlighted: bool = false
 var _highlight_material: StandardMaterial3D
@@ -97,6 +98,9 @@ func set_invalid(invalid: bool) -> void:
 		set_highlighted(true, Color(1.0, 0.0, 0.0, 0.5))
 	else:
 		set_highlighted(false)
+
+func set_depth(depth:int) -> void:
+	shape.depth = depth
 
 func set_highlighted(highlighted: bool, color: Color = Color(0.2, 0.6, 1.0, 0.5)) -> void:
 	_highlighted = highlighted

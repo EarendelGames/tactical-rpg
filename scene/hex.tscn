@@ -1,6 +1,7 @@
 [gd_scene format=4 uid="uid://ca6g4l2vsvxte"]
 
 [ext_resource type="Script" uid="uid://bonmls1y4r5gs" path="res://script/hex_cell.gd" id="1_khich"]
+[ext_resource type="Script" uid="uid://cbo3qipknide" path="res://script/hex_shape_3d.gd" id="2_slqgy"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_djunl"]
 transparency = 1
@@ -42,8 +43,8 @@ shadow_mesh = SubResource("ArrayMesh_nmuh6")
 transparency = 1
 albedo_color = Color(0.4862745, 0.4862745, 0.4862745, 0.11372549)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_8ebx4"]
-points = PackedVector3Array(0, 0, -0.58, 0.501, 0, -0.289, 0.501, 0, 0.289, 0, 0, 0.58, -0.501, 0, 0.289, -0.501, 0, -0.289)
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_slqgy"]
+points = PackedVector3Array(0.5, 0, 0.28867513, 3.535134e-17, 0, 0.57735026, -0.5, 0, 0.28867513, -0.5, 0, -0.28867513, -1.06054024e-16, 0, -0.57735026, 0.5, 0, -0.28867513, 0.5, -0.5, 0.28867513, 3.535134e-17, -0.5, 0.57735026, -0.5, -0.5, 0.28867513, -0.5, -0.5, -0.28867513, -1.06054024e-16, -0.5, -0.57735026, 0.5, -0.5, -0.28867513)
 
 [node name="Node3D" type="Node3D" unique_id=1234296527]
 script = ExtResource("1_khich")
@@ -61,5 +62,7 @@ skeleton = NodePath("")
 
 [node name="Area3D" type="Area3D" parent="." unique_id=1971132589]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=1415583386]
-shape = SubResource("ConvexPolygonShape3D_8ebx4")
+[node name="HexShape3D" type="CollisionShape3D" parent="Area3D" unique_id=2122824615]
+shape = SubResource("ConvexPolygonShape3D_slqgy")
+script = ExtResource("2_slqgy")
+metadata/_custom_type_script = "uid://cbo3qipknide"
