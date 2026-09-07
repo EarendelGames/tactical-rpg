@@ -1,6 +1,11 @@
 # initiative.gd
 class_name Timeline
 
+# This was intended to allow a smoother transition of the Banner Saga player turns system with concepts like rounds. 
+# Now the plan is instead to have a more traditional 1 unit turn per round.
+# Specific units may be able to take multiple turns if outnumbered,
+# but that would be a special ability, not a default aspect of the rounds system. 
+
 const MIN_PREDICTED_ACTIONS: int = 10
 
 var world_time: float = 0.0

@@ -213,6 +213,6 @@ func _die(_tree: SequenceTree, _parent_node: ActionNode) -> void:
 	print("%s died" % unit_name)
 
 
-func activate_hover() -> void:
-	move_ability.hover_highlight()
+func show_move_range() -> void:
+	move_ability.range_highlight()
 	

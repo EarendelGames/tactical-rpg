@@ -50,7 +50,8 @@ func prep_for_input() -> void:
 		if input_phase.selection_type == Selection.Type.UNIT:
 			cell.set_highlighted(true, Color(1, 0, 0, 0.5))
 
-func hover_highlight() -> void:
+func range_highlight() -> void:
+	unit.battle.clear_hover_highlights()
 	var reachable_cells = get_reachable_cells()
 	var input_phase:AbilityInput = ability.inputs[0] #only consider the first phase for now
 	for cell:HexCell in reachable_cells:

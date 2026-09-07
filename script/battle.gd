@@ -6,6 +6,7 @@ extends Node3D
 
 var units: Array[Unit] = []
 var current_unit_index: int = 0
+var selected_unit: Unit = null
 var sequence_tree: SequenceTree = null
 var sequence_timer: float = 0
 @onready var battle_ui: BattleUI = $"BattleUI"
@@ -139,11 +140,22 @@ func set_input_consumer(ua:UnitAbility) -> void:
 	input_consumer = ua
 	
 func cell_clicked(cell: HexCell, pos, normal) -> void:
+	selected_unit = null
 	if input_consumer:
 		print("a")
 		input_consumer.cell_clicked(cell, pos, normal)
 	else:
+		if cell.occupant:
+			selected_unit = cell.occupant
+			selected_unit.show_move_range()
+			
 		print("no input consumer")
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == 2:
+		selected_unit = null
+		clear_highlights()
+		input_consumer = null
 
 # --- Setup ---
 

@@ -31,7 +31,6 @@ var _pos_to_cell: Dictionary = {}
 var cells_array: Array[HexCell]
 var _hovered_cell: HexCell
 var battle: Battle
-signal hovered_cell_changed(cell: HexCell)
 
 # --- Registration ---
 
@@ -114,12 +113,11 @@ func unset_hovered_cell(cell:HexCell) -> void:
 	_on_hovered_cell_changed()
 	
 func _on_hovered_cell_changed() -> void:
-	if _hovered_cell and _hovered_cell.occupant:
-		_hovered_cell.occupant.activate_hover()
-	else:
+	if not battle.selected_unit:
 		for cell in cells_array:
 			cell.set_hover_highlighted(false)
-	hovered_cell_changed.emit()
+		if _hovered_cell:
+			_hovered_cell.set_hover_highlighted(true)
 
 func cell_clicked(cell: HexCell, pos, normal) -> void:
 	battle.cell_clicked(cell, pos, normal)
