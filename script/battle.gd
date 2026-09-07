@@ -1,64 +1,73 @@
-# battle/battle.gd
 class_name Battle
 extends Node3D
 
 @onready var grid: GridHandler = $GridHandler
+@onready var battle_ui: BattleUI = $"BattleUI"
 
-var units: Array[Unit] = []
-var current_unit_index: int = 0
+var units: Array[Unit] = []          # Every unit that has ever existed in this battle. Append-only; index == unit_id.
+var current_units: Array[Unit] = []  # Units currently alive and present on the map.
+var current_unit: Unit = null        # Direct reference to whichever unit's turn it is.
 var selected_unit: Unit = null
 var sequence_tree: SequenceTree = null
 var sequence_timer: float = 0
-@onready var battle_ui: BattleUI = $"BattleUI"
-var battle_sides: Dictionary = {} #BattleSide.Side:Array[Unit] 
+var battle_sides: Dictionary = {}    # BattleSide.Side -> BattleSide
 var timeline: Timeline
-var _next_unit_id: int = 0; # Should be moved to a higher level.
 var input_consumer: UnitAbility = null
 
-func next_unit_id() -> int:
-	_next_unit_id += 1
-	return _next_unit_id
-	
+func register_unit(unit: Unit) -> void:
+	unit.battle = self
+	unit.unit_id = units.size()
+	units.append(unit)
+	current_units.append(unit)
+	if not battle_sides.has(unit.side_enum):
+		battle_sides[unit.side_enum] = BattleSide.new(unit.side_enum)
+	battle_sides[unit.side_enum].units.append(unit)
+
+func remove_unit_from_play(unit: Unit) -> void:
+	current_units.erase(unit)
+	if unit.current_cell:
+		unit.current_cell.occupant = null
+		unit.current_cell = null
+	if timeline:
+		timeline.notify_unit_removed(self, unit)
+
 func _ready() -> void:
 	print("Battle ready")
 	grid.battle = self
 	battle_ui.battle = self
-	timeline = Timeline.new()
+	timeline = TimelineDirect.new() # swap TimelineDirect and TimelineFluid to switch systems
 	get_viewport().physics_object_picking = true
-	for unit:Unit in $Units.get_children():
-		units.append(unit)
-		unit.battle = self
-		if not battle_sides.has(unit.side_enum):
-			battle_sides[unit.side_enum] = BattleSide.new(unit.side_enum)
-		battle_sides[unit.side_enum].units.append(unit)
+	for unit: Unit in $Units.get_children():
+		register_unit(unit)
 	for side_enum in battle_sides:
 		timeline.register_side(battle_sides[side_enum])
-	start_combat(units)
-	#TODO: Use timeline for next unit instead of incrementing current_unit_index
+	start_combat()
 
-func start_combat(unit_list: Array[Unit]) -> void:
-	print("Battle start_combat with units")
-	units = unit_list
-	for unit in units:
-		unit.initialise(self)
+func start_combat() -> void:
+	print("Battle start_combat")
+	for unit in current_units:
+		unit.setup_abilities()
 		unit.roll_initiative()
-	units.sort_custom(func(a: Unit, b: Unit): return a.initiative > b.initiative)
+	timeline.on_combat_start(self)
 	grid.rebuild_pos_lookup()
 	_assign_units_to_cells()
-	for unit in units:
+	for unit in current_units:
 		unit.register_ability_triggers()
-	current_unit_index = 0
-	_begin_turn()
+	_advance_to_next_turn()
 
-func _begin_turn() -> void:
-	print("Battle _begin_turn")
-	var unit := units[current_unit_index]
-	if unit.is_dead:
-		advance_turn()
-		return
-	print("Turn: %s (initiative %.2f)" % [unit.unit_name, unit.initiative])
-	unit.turn_start()
-	unit.move_ability.prep_for_input()
+func _advance_to_next_turn() -> void:
+	var event: TimelineEvent = timeline.advance(self)
+	while event.is_round_end or event.unit.is_dead:
+		if event.is_round_end:
+			_on_round_end()
+		event = timeline.advance(self)
+	current_unit = event.unit
+	print("Turn: %s (initiative %.2f)" % [current_unit.unit_name, current_unit.initiative])
+	current_unit.turn_start()
+	current_unit.move_ability.prep_for_input()
+
+func _on_round_end() -> void:
+	pass # TODO: environmental effects - fire spread, water flow, etc.
 
 func _process(delta: float) -> void:
 	if not sequence_tree: return
@@ -71,8 +80,6 @@ func _process(delta: float) -> void:
 			var unit := get_current_unit()
 			if unit and unit.movement_points > 0:
 				unit.move_ability.prep_for_input()
-			#_advance_turn()
-			
 
 # --- Movement ---
 func place_on_cell(unit:Unit, cell: HexCell) -> void:
@@ -83,12 +90,12 @@ func place_on_cell(unit:Unit, cell: HexCell) -> void:
 	cell.occupant = unit
 	if start_cell:
 		start_cell.occupant = null
-	if occupant: # swap if occupied
+	if occupant:
 		print("Swap positions")
 		occupant.current_cell = start_cell
 		occupant.global_position = start_cell.global_position
 		start_cell.occupant = occupant
-		
+
 func move_to_cell(unit:Unit, cell: HexCell) -> void:
 	var occupant = cell.occupant
 	var start_cell = unit.current_cell
@@ -96,9 +103,7 @@ func move_to_cell(unit:Unit, cell: HexCell) -> void:
 	cell.occupant = unit
 	if start_cell:
 		start_cell.occupant = null
-		
-	#unit.global_position = cell.global_position
-	
+
 	var delay := 0.3
 	var from = unit.global_position
 	var to = cell.global_position
@@ -106,39 +111,36 @@ func move_to_cell(unit:Unit, cell: HexCell) -> void:
 	tween.set_parallel(true)
 	tween.tween_property(unit, "global_position",to, delay).set_custom_interpolator(Easing.in_out_faint)
 	tween.tween_property(unit, "rotation:y", wrapf(atan2(to.x - from.x, to.z - from.z), unit.rotation.y - PI, unit.rotation.y + PI), 0.5 * delay)
-	
-	if occupant: # swap if occupied
+
+	if occupant:
 		print("Swap positions")
 		occupant.current_cell = start_cell
 		start_cell.occupant = occupant
-		#occupant.global_position = start_cell.global_position
 		from = occupant.global_position
 		to = start_cell.global_position
 		tween.tween_property(occupant, "global_position", to, delay).set_custom_interpolator(Easing.in_out_faint)
 		tween.tween_property(occupant, "rotation:y", wrapf(atan2(to.x - from.x, to.z - from.z), occupant.rotation.y - PI, occupant.rotation.y + PI), 0.5 * delay)
-	
+
 	sequence_timer -= delay
 	tween.play()
-
 
 # --- Turn management ---
 
 func advance_turn() -> void:
 	clear_highlights()
-	current_unit_index = (current_unit_index + 1) % units.size()
-	_begin_turn()
+	_advance_to_next_turn()
 
 func clear_highlights() -> void:
 	for cell:HexCell in grid.cells_array:
 		cell.set_highlighted(false)
-		
+
 func clear_hover_highlights() -> void:
 	for cell:HexCell in grid.cells_array:
 		cell.set_hover_highlighted(false)
-		
+
 func set_input_consumer(ua:UnitAbility) -> void:
 	input_consumer = ua
-	
+
 func cell_clicked(cell: HexCell, pos, normal) -> void:
 	selected_unit = null
 	if input_consumer:
@@ -148,7 +150,6 @@ func cell_clicked(cell: HexCell, pos, normal) -> void:
 		if cell.occupant:
 			selected_unit = cell.occupant
 			selected_unit.show_move_range()
-			
 		print("no input consumer")
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -160,7 +161,7 @@ func _unhandled_input(event: InputEvent) -> void:
 # --- Setup ---
 
 func _assign_units_to_cells() -> void:
-	for unit in units:
+	for unit in current_units:
 		var best_cell := _find_closest_open_cell(unit.global_position)
 		if best_cell:
 			place_on_cell(unit, best_cell)
@@ -185,6 +186,6 @@ func _find_closest_open_cell(world_pos: Vector3) -> HexCell:
 func new_sequence_tree(unit_ability:UnitAbility, inputs:Dictionary) -> SequenceTree:
 	sequence_tree = SequenceTree.new(self, unit_ability, inputs)
 	return sequence_tree
-	
+
 func get_current_unit() -> Unit:
-	return units[current_unit_index]
+	return current_unit

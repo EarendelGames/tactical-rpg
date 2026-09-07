@@ -1,7 +1,7 @@
 class_name TimelineEvent
 
 var unit: Unit
-var side_name: BattleSide.Side
+var side_enum: BattleSide.Side
 var world_time: float
 var is_round_end: bool
 

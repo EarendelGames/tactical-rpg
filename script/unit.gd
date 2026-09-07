@@ -53,9 +53,7 @@ func _ready() -> void:
 func update_overhead_ui() -> void:
 	overhead_ui.find_child("Label").text = "Health %.0f" % [health]
 
-func initialise(_battle: Battle) -> void:
-	battle = battle
-	unit_id = battle.next_unit_id()
+func setup_abilities() -> void:
 	move_ability = Abilities.basic_move.as_unit_ability(self)
 	abilities.append(Abilities.basic_attack.as_unit_ability(self))
 
@@ -207,10 +205,8 @@ func heal(amount: float) -> void:
 
 func _die(_tree: SequenceTree, _parent_node: ActionNode) -> void:
 	is_dead = true
-	if current_cell:
-		current_cell.occupant = null
-		current_cell = null
 	print("%s died" % unit_name)
+	battle.remove_unit_from_play(self)
 
 
 func show_move_range() -> void:
