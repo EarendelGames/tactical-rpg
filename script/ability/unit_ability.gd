@@ -38,13 +38,15 @@ func consume() -> void:
 
 func prep_for_input() -> void:
 	unit.battle.set_input_consumer(self)
-	range_highlight()
+	valid_cells = get_reachable_cells()
+	range_highlight(valid_cells)
 
-func range_highlight() -> void:
+func range_highlight(cells = null) -> void:
 	unit.battle.clear_highlights()
-	var reachable_cells = get_reachable_cells()
+	if not cells: 
+		cells =  get_reachable_cells()
 	#var input_phase:AbilityInput = ability.inputs[0] #only consider the first phase for now
-	for cell:HexCell in reachable_cells:
+	for cell:HexCell in cells:
 		#if input_phase.selection_type == Selection.Type.CELL:
 		#if input_phase.selection_type == Selection.Type.UNIT:
 		cell.set_range_layer(Color(1.0, 0.9, 0.0, 0.5), HexCell.Edge.ALL)
