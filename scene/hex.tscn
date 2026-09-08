@@ -17,33 +17,14 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAAAAAAAAAAAAAAAAAAAPwAAAAA6zZM+fwcjJAAAAAA6zRM/AAAAvwAAAAA6zZM+AAAAvwAAAAA6zZO+P4v0pAAAAAA6zRO/AAAAPwAAAAA6zZO+")
 }]
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_ao1v8"]
-_surfaces = [{
-"aabb": AABB(-0.5, 0, -0.57735026, 1, 1e-05, 1.1547005),
-"attribute_data": PackedByteArray("AAAAPwAAAD/s2W4/AABAPwAAAD8AAIA/ozCJPQAAQD+jMIk9AACAPgAAAD8AAAAA7NluPwAAgD4="),
-"format": 34359742481,
-"index_count": 18,
-"index_data": PackedByteArray("AAABAAIAAAACAAMAAAADAAQAAAAEAAUAAAAFAAYAAAAGAAEA"),
-"primitive": 3,
-"uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 7,
-"vertex_data": PackedByteArray("AAAAAAAAAAAAAAAAAAAAPwAAAAA6zZM+fwcjJAAAAAA6zRM/AAAAvwAAAAA6zZM+AAAAvwAAAAA6zZO+P4v0pAAAAAA6zRO/AAAAPwAAAAA6zZO+")
-}]
-
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_2guvj"]
 points = PackedVector3Array(0.5, 0, 0.28867513, 3.535134e-17, 0, 0.57735026, -0.5, 0, 0.28867513, -0.5, 0, -0.28867513, -1.06054024e-16, 0, -0.57735026, 0.5, 0, -0.28867513, 0.5, -0.5, 0.28867513, 3.535134e-17, -0.5, 0.57735026, -0.5, -0.5, 0.28867513, -0.5, -0.5, -0.28867513, -1.06054024e-16, -0.5, -0.57735026, 0.5, -0.5, -0.28867513)
 
 [node name="Node3D" type="Node3D" unique_id=1234296527]
 script = ExtResource("1_khich")
 
-[node name="MeshLower" type="MeshInstance3D" parent="." unique_id=680307375]
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=680307375]
 mesh = SubResource("ArrayMesh_0hfuy")
-script = ExtResource("3_0hfuy")
-metadata/_custom_type_script = "uid://dnvr04fclhup8"
-
-[node name="MeshHigher" type="MeshInstance3D" parent="." unique_id=1548797096]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0.00194785, 0)
-mesh = SubResource("ArrayMesh_ao1v8")
 script = ExtResource("3_0hfuy")
 metadata/_custom_type_script = "uid://dnvr04fclhup8"
 

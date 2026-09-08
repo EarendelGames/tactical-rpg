@@ -132,11 +132,8 @@ func advance_turn() -> void:
 
 func clear_highlights() -> void:
 	for cell:HexCell in grid.cells_array:
-		cell.set_highlighted(false)
-
-func clear_hover_highlights() -> void:
-	for cell:HexCell in grid.cells_array:
-		cell.set_hover_highlighted(false)
+		cell.set_range_layer(Color(0,0,0,0))
+		cell.set_effect_layer(Color(0,0,0,0))
 
 func set_input_consumer(ua:UnitAbility) -> void:
 	input_consumer = ua

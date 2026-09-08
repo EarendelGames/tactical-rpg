@@ -10,16 +10,9 @@ extends Node3D
 # Higher values require more movement points.
 @export var movement_cost: int = 1
 
-@onready var mesh_lower: MeshInstance3D = $MeshLower
-@onready var mesh_higher: MeshInstance3D = $MeshHigher
+@onready var mesh: MeshInstance3D = $Mesh
 @onready var area: Area3D = $Area3D
 @onready var shape: HexShape3D = $Area3D/HexShape3D
-
-var _highlighted: bool = false
-var _highlight_material: StandardMaterial3D
-
-var _hover_highlighted: bool = false
-var _hover_highlight_material: StandardMaterial3D
 
 var _grid_handler: GridHandler = null
 
@@ -29,19 +22,36 @@ var occupant: Unit = null
 # Each entry is a Callable: (tree: EventTree, parent_node: EventNode, moving_unit: Unit) -> void
 var _movement_triggers: Array = []
 
+# --- Highlight state ---
+# Two overlap-able layers: "range" (movement range / reach) and "effect" (AOE /
+# affected cells). Each layer has a fill color and a 6-bit outline mask, where
+# bit i means edge i is an outer edge of that layer's region on this cell.
+# Edge/corner index order matches GridHandler's NEIGHBOUR_OFFSETS direction order.
+var range_layer_color: Color = Color(0, 0, 0, 0)
+var range_outline_mask: int = 0
+var effect_layer_color: Color = Color(0, 0, 0, 0)
+var effect_outline_mask: int = 0
+enum Edge { NONE = 0, E0 = 1, E1 = 2, E2 = 4, E3 = 8, E4 = 16, E5 = 32, ALL = 63}
+
+# Cursor targeting indicator. Only one of these is meaningful at a time,
+# depending on the ability's selection mode (cell / edge / corner).
+var cursor_cell_highlight: bool = false
+var cursor_edge_highlight: int = -1   # 0-5, -1 = off
+var cursor_corner_highlight: int = -1 # 0-5, -1 = off
+
+# Shared across every HexCell instance so they all draw with one material and
+# differ only via per-instance shader parameters.
+static var _shared_material: ShaderMaterial = null
+
 func _ready() -> void:
-	
+
 	area.mouse_entered.connect(_on_mouse_entered)
 	area.mouse_exited.connect(_on_mouse_exited)
-	
-	_highlight_material = StandardMaterial3D.new()
-	_highlight_material.albedo_color = Color(0.2, 0.6, 1.0, 0.5)
-	_highlight_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	
-	_hover_highlight_material = StandardMaterial3D.new()
-	_hover_highlight_material.albedo_color = Color(0.2, 0.6, 1.0, 0.5)
-	_hover_highlight_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	
+	area.input_event.connect(_on_area_3d_input_event)
+
+	_assign_shader_material()
+	_push_shader_params()
+
 	_find_grid_handler()
 	_register()
 	var body := find_child("Area3D")
@@ -91,38 +101,101 @@ func update_from_int_pos() -> void:
 		position = _grid_handler.int_to_world(int_pos)
 		scale = Vector3.ONE * _grid_handler.cell_spacing
 
-# --- Materials ---
-
-func set_invalid(invalid: bool) -> void:
-	if invalid:
-		set_highlighted(true, Color(1.0, 0.0, 0.0, 0.5))
-	else:
-		set_highlighted(false)
-
-func set_depth(depth:int) -> void:
+func set_depth(depth: int) -> void:
 	shape.depth = depth
 
-func set_highlighted(highlighted: bool, color: Color = Color(0.2, 0.6, 1.0, 0.5)) -> void:
-	_highlighted = highlighted
-	_apply_highlighted_material_overrides(color)
+# --- Shader material ---
 
-func _apply_highlighted_material_overrides(color: Color) -> void:
-	if _highlighted:
-		_highlight_material.albedo_color = color
-		mesh_higher.material_override = _highlight_material
-	else:
-		mesh_higher.material_override = null
-		
-func set_hover_highlighted(highlighted: bool, color: Color = Color(0.6, 0.5, 0.1, 0.5)) -> void:
-	_hover_highlighted = highlighted
-	_apply_hover_highlighted_material_overrides(color)
+func _assign_shader_material() -> void:
+	if _shared_material == null:
+		var shader: Shader = preload("res://shader/hex_cell.gdshader")
+		_shared_material = ShaderMaterial.new()
+		_shared_material.shader = shader
+	mesh.material_override = _shared_material
 
-func _apply_hover_highlighted_material_overrides(color: Color) -> void:
-	if _hover_highlighted:
-		_hover_highlight_material.albedo_color = color
-		mesh_lower.material_override = _hover_highlight_material
-	else:
-		mesh_lower.material_override = null
+# --- Highlight layer API ---
+# Abilities / grid state call these. The cell only recomputes and re-pushes
+# to the shader when something actually changed, per the caller's diff.
+
+func set_range_layer(color: Color, outline_mask: int = 0) -> void:
+	if color == range_layer_color and outline_mask == range_outline_mask:
+		return
+	range_layer_color = color
+	range_outline_mask = outline_mask
+	_push_shader_params()
+
+func clear_range_layer() -> void:
+	set_range_layer(Color(0, 0, 0, 0), 0)
+
+func set_effect_layer(color: Color, outline_mask: int = 0) -> void:
+	if color == effect_layer_color and outline_mask == effect_outline_mask:
+		return
+	effect_layer_color = color
+	effect_outline_mask = outline_mask
+	_push_shader_params()
+
+func clear_effect_layer() -> void:
+	set_effect_layer(Color(0, 0, 0, 0), 0)
+
+func set_cursor_cell(highlighted: bool) -> void:
+	if highlighted == cursor_cell_highlight:
+		return
+	cursor_cell_highlight = highlighted
+	_push_shader_params()
+
+func set_cursor_edge(edge: int) -> void:
+	if edge == cursor_edge_highlight:
+		return
+	cursor_edge_highlight = edge
+	_push_shader_params()
+
+func set_cursor_corner(corner: int) -> void:
+	if corner == cursor_corner_highlight:
+		return
+	cursor_corner_highlight = corner
+	_push_shader_params()
+
+func clear_cursor() -> void:
+	set_cursor_cell(false)
+	set_cursor_edge(-1)
+	set_cursor_corner(-1)
+
+# --- Blend + push ---
+
+# rgb = lerp weighted by relative alpha, alpha = sum of both (clamped to 1).
+func _blend(a: Color, b: Color) -> Color:
+	var total_alpha := a.a + b.a
+	if total_alpha <= 0.0:
+		return Color(0, 0, 0, 0)
+	var t := b.a / total_alpha
+	return Color(
+		lerp(a.r, b.r, t),
+		lerp(a.g, b.g, t),
+		lerp(a.b, b.b, t),
+		minf(total_alpha, 1.0)
+	)
+
+func _edge_outline_color(edge: int) -> Color:
+	var bit := 1 << edge
+	var range_active := (range_outline_mask & bit) != 0
+	var effect_active := (effect_outline_mask & bit) != 0
+	if range_active and effect_active:
+		return _blend(range_layer_color, effect_layer_color)
+	elif range_active:
+		return range_layer_color
+	elif effect_active:
+		return effect_layer_color
+	return Color(0, 0, 0, 0)
+
+func _push_shader_params() -> void:
+	if mesh == null:
+		return
+	mesh.set_instance_shader_parameter("overlay_color", _blend(range_layer_color, effect_layer_color))
+	for i in 6:
+		mesh.set_instance_shader_parameter("outline_color_%d" % i, _edge_outline_color(i))
+	mesh.set_instance_shader_parameter("cursor_cell_highlight", cursor_cell_highlight)
+	mesh.set_instance_shader_parameter("cursor_edge_highlight", cursor_edge_highlight)
+	mesh.set_instance_shader_parameter("cursor_corner_highlight", cursor_corner_highlight)
 
 # --- Input ---
 
@@ -136,6 +209,11 @@ func _on_mouse_entered() -> void:
 
 func _on_mouse_exited() -> void:
 	_grid_handler.unset_hovered_cell(self)
+	
+func _on_area_3d_input_event(_camera: Node, event: InputEvent, event_position: Vector3, _normal: Vector3, _shape_idx: int) -> void:
+	if event is InputEventMouseMotion:
+		_grid_handler.cell_mouse_motion(self, event_position)
+
 
 # --- Movement triggers ---
 

@@ -30,8 +30,14 @@ var _cells: Dictionary = {}
 var _pos_to_cell: Dictionary = {}
 var cells_2d: Dictionary[Vector2i, Array] = {}
 var cells_array: Array[HexCell]
-var _hovered_cell: HexCell
 var battle: Battle
+
+enum CursorMode { CELL, EDGE, CORNER }
+var cursor_mode: CursorMode = CursorMode.CELL
+var _hovered_cell: HexCell
+var _hovered_segment: int
+#TODO: also add hovered segment, which 1/12 of the cell is hovered,
+# so that the information can be used for edge and corner modes.
 
 # --- Registration ---
 
@@ -55,8 +61,9 @@ func unregister_cell(cell: HexCell, int_pos: Vector3i) -> void:
 func _validate_key(key: String) -> void:
 	var cells: Array = _cells.get(key, [])
 	var conflict := cells.size() > 1
-	for cell in cells:
-		(cell as HexCell).set_invalid(conflict)
+	for cell: HexCell in cells:
+		if conflict:
+			cell.set_effect_layer(Color(1,0,0,0.5), 0)
 
 func _pos_key(int_pos: Vector3i) -> String:
 	return "%d,%d,%d" % [int_pos.x, int_pos.y, int_pos.z]
@@ -131,22 +138,38 @@ func get_cell_at(int_pos: Vector3i) -> HexCell:
 	return _pos_to_cell.get(int_pos, null)
 	
 func set_hovered_cell(cell:HexCell) -> void:
-	_hovered_cell = cell
-	_on_hovered_cell_changed()
-	
+	if _hovered_cell != cell:
+		_hovered_cell = cell
+		_on_hovered_state_changed()
+
 func unset_hovered_cell(cell:HexCell) -> void:
 	if _hovered_cell == cell:
 		_hovered_cell = null
-	_on_hovered_cell_changed()
-	
-func _on_hovered_cell_changed() -> void:
-	if not battle.selected_unit:
-		for cell in cells_array:
-			cell.set_hover_highlighted(false)
-		if _hovered_cell:
-			_hovered_cell.set_hover_highlighted(true)
+		_on_hovered_state_changed()
 
-func cell_clicked(cell: HexCell, pos, normal) -> void:
+func _on_hovered_state_changed() -> void:
+	for cell in cells_array:
+		cell.set_cursor_cell(false)
+	if _hovered_cell:
+		_hovered_cell.set_cursor_cell(true)
+
+func set_hovered_segment(segment:int) -> void:
+	if _hovered_segment != segment:
+		_hovered_segment = segment
+		_on_hovered_state_changed()
+	
+func cell_mouse_motion(cell:HexCell, pos: Vector3) -> void:
+	#Calculate which 1/12 of the cell this is.
+	set_hovered_segment(get_hexagon_segment(cell, pos))
+
+func get_hexagon_segment(cell: HexCell, world_pos: Vector3) -> int:
+	var local_pos: Vector3 = cell.to_local(world_pos)
+	var angle: float = atan2(local_pos.z, local_pos.x)
+	if angle < 0:
+		angle += 2 * PI
+	return clampi(floor(12 * angle / TAU), 0, 11)
+
+func cell_clicked(cell: HexCell, pos: Vector3, normal: Vector3) -> void:
 	battle.cell_clicked(cell, pos, normal)
 
 # --- Neighbours ---

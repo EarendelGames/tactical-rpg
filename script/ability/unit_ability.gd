@@ -38,27 +38,16 @@ func consume() -> void:
 
 func prep_for_input() -> void:
 	unit.battle.set_input_consumer(self)
-	
-	unit.battle.clear_highlights()
-	valid_cells = get_reachable_cells()
-	var input_phase:AbilityInput = ability.inputs[0] #only consider the first phase for now
-	
-	unit.battle.clear_highlights()
-	for cell:HexCell in valid_cells:
-		if input_phase.selection_type == Selection.Type.CELL:
-			cell.set_highlighted(true)
-		if input_phase.selection_type == Selection.Type.UNIT:
-			cell.set_highlighted(true, Color(1, 0, 0, 0.5))
+	range_highlight()
 
 func range_highlight() -> void:
-	unit.battle.clear_hover_highlights()
+	unit.battle.clear_highlights()
 	var reachable_cells = get_reachable_cells()
-	var input_phase:AbilityInput = ability.inputs[0] #only consider the first phase for now
+	#var input_phase:AbilityInput = ability.inputs[0] #only consider the first phase for now
 	for cell:HexCell in reachable_cells:
-		if input_phase.selection_type == Selection.Type.CELL:
-			cell.set_hover_highlighted(true)
-		if input_phase.selection_type == Selection.Type.UNIT:
-			cell.set_hover_highlighted(true, Color(1, 0, 0, 0.25))
+		#if input_phase.selection_type == Selection.Type.CELL:
+		#if input_phase.selection_type == Selection.Type.UNIT:
+		cell.set_range_layer(Color(1.0, 0.9, 0.0, 0.5), HexCell.Edge.ALL)
 
 func get_reachable_cells() -> Array[HexCell]:
 	var collect_cells: Array[HexCell]

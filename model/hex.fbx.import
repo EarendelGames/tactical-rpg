@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ojdfuhhvp8v5"
-path="res://.godot/imported/hex.fbx-79243f2a70f019d27453e0e821b365c7.scn"
+path="res://.godot/imported/hex.fbx-22f34626eb75a9e2b1c2585479c4e39a.scn"
 
 [deps]
 
-source_file="res://models/hex.fbx"
-dest_files=["res://.godot/imported/hex.fbx-79243f2a70f019d27453e0e821b365c7.scn"]
+source_file="res://model/hex.fbx"
+dest_files=["res://.godot/imported/hex.fbx-22f34626eb75a9e2b1c2585479c4e39a.scn"]
 
 [params]
 
