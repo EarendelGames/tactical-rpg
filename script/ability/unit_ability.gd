@@ -80,19 +80,23 @@ func get_reachable_cells() -> Array[HexCell]:
 func cell_clicked(cell: HexCell, _pos, _normal) -> void:
 	print("UnitAbility _on_cell_clicked")
 	if valid_cells.has(cell):
-		unit.battle.clear_highlights()
-		unit.battle.set_input_consumer(null)
-		activate_ability({"target_cell" = cell})
+		var input_phase:AbilityInput = ability.inputs[0] #only consider the first phase for now
+		if input_phase.selection_type == Selection.Type.UNIT:
+			if cell.occupant:
+				if not cell.occupant:
+					print("No occupant")
+					return
+				print("UnitAbility _on_unit_clicked")
+				unit.battle.clear_highlights()
+				unit.battle.set_input_consumer(null)
+				activate_ability({"target_unit" = cell.occupant, "target_cell" = cell})
+				return
+		else:
+			unit.battle.clear_highlights()
+			unit.battle.set_input_consumer(null)
+			activate_ability({"target_cell" = cell})
 	else:
 		print("invalid cell")
-	
-func unit_clicked(cell: HexCell) -> void:
-	if not cell.occupant:
-		return
-	print("UnitAbility _on_unit_clicked")
-	unit.battle.clear_highlights()
-	unit.battle.set_input_consumer(null)
-	activate_ability({"target_unit" = cell.occupant, "target_cell" = cell})
 
 func activate_ability(resolved_inputs: Dictionary) -> void:
 	print("Battle activate_ability")
