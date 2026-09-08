@@ -13,15 +13,22 @@ extends Node3D
 		height_step = value
 		_update_all_cells()
 
+#offsets should be in a order that matches edge indexes
 const NEIGHBOUR_OFFSETS_EVEN: Array[Vector2i] = [
-	Vector2i(1, 0), Vector2i(-1, 0),
-	Vector2i(0, 1), Vector2i(0, -1),
-	Vector2i(-1, 1), Vector2i(-1, -1),
+	Vector2i(1, 0),   # E  - edge 0
+	Vector2i(0, 1),   # NE - edge 1
+	Vector2i(-1, 1),  # NW - edge 2
+	Vector2i(-1, 0),  # W  - edge 3
+	Vector2i(-1, -1), # SW - edge 4
+	Vector2i(0, -1),  # SE - edge 5
 ]
 const NEIGHBOUR_OFFSETS_ODD: Array[Vector2i] = [
-	Vector2i(1, 0), Vector2i(-1, 0),
-	Vector2i(1, 1), Vector2i(1, -1),
-	Vector2i(0, 1), Vector2i(0, -1),
+	Vector2i(1, 0),  # E  - edge 0
+	Vector2i(1, 1),  # NE - edge 1
+	Vector2i(0, 1),  # NW - edge 2
+	Vector2i(-1, 0), # W  - edge 3
+	Vector2i(0, -1), # SW - edge 4
+	Vector2i(1, -1), # SE - edge 5
 ]
 
 # Keyed by "ix,iy,iz", value is array of HexCells at that int position, iy is height
@@ -33,7 +40,7 @@ var cells_array: Array[HexCell]
 var battle: Battle
 
 enum CursorMode { CELL, EDGE, CORNER }
-var cursor_mode: CursorMode = CursorMode.CELL
+var _cursor_mode: CursorMode = CursorMode.CELL
 var _hovered_cell: HexCell
 var _hovered_segment: int
 #TODO: also add hovered segment, which 1/12 of the cell is hovered,
@@ -147,27 +154,83 @@ func unset_hovered_cell(cell:HexCell) -> void:
 		_hovered_cell = null
 		_on_hovered_state_changed()
 
-func _on_hovered_state_changed() -> void:
-	for cell in cells_array:
-		cell.set_cursor_cell(false)
-	if _hovered_cell:
-		_hovered_cell.set_cursor_cell(true)
-
 func set_hovered_segment(segment:int) -> void:
 	if _hovered_segment != segment:
 		_hovered_segment = segment
 		_on_hovered_state_changed()
+		
+func set_cursor_mode(mode:CursorMode) -> void:
+	if _cursor_mode != mode:
+		_cursor_mode = mode
+		_on_hovered_state_changed()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("debug_change_cursor_mode"):
+		print("Cycle cursor mode")
+		if _cursor_mode == CursorMode.CELL:
+			set_cursor_mode(CursorMode.EDGE)
+		elif _cursor_mode == CursorMode.EDGE:
+			set_cursor_mode(CursorMode.CORNER)
+		else:
+			set_cursor_mode(CursorMode.CELL)
+
+func _on_hovered_state_changed() -> void:
+	for cell in cells_array:
+		cell.set_cursor_cell(false)
+	if _hovered_cell:
+		if _cursor_mode == CursorMode.EDGE:
+			_hovered_cell.set_cursor_cell(true)
+			var cells = get_edge_opposite_cells(_hovered_cell, get_edge_index_from_segment(_hovered_segment), 1, 1)
+			for cell in cells:
+				cell.set_cursor_cell(true)
+		elif _cursor_mode == CursorMode.CORNER:
+			_hovered_cell.set_cursor_cell(true)
+			var cells = get_corner_opposite_cells(_hovered_cell, get_corner_index_from_segment(_hovered_segment), 1, 1)
+			for cell in cells:
+				cell.set_cursor_cell(true)
+		else:
+			_hovered_cell.set_cursor_cell(true)
+
+func get_edge_index_from_segment(segment: int) -> int:
+	return floori(segment / 2.0)
 	
+func get_corner_index_from_segment(segment: int) -> int:
+	return wrapi(floori((segment - 1) / 2.0), 0, 6)
+
+func get_edge_opposite_cells(cell:HexCell, edge_index:int, down: int = 0, up: int = 0) -> Array[HexCell]:
+	var neighbours: Array[HexCell] = []
+	var pos := cell.int_pos
+	var pos2d := pos_2d(pos)
+	var offsets := NEIGHBOUR_OFFSETS_ODD if (pos.z & 1) else NEIGHBOUR_OFFSETS_EVEN
+	var candidate := pos2d + offsets[edge_index]
+	if cells_2d.has(candidate):
+		for neighbour:HexCell in cells_2d[candidate]:
+			if neighbour.int_pos.y >= pos.y - down and neighbour.int_pos.y <= pos.y + up:
+				neighbours.append(neighbour)
+	return neighbours
+
+func get_corner_opposite_cells(cell:HexCell, corner_index:int, down: int = 0, up: int = 0) -> Array[HexCell]:
+	var neighbours: Array[HexCell] = []
+	var pos := cell.int_pos
+	var pos2d := pos_2d(pos)
+	var offsets := NEIGHBOUR_OFFSETS_ODD if (pos.z & 1) else NEIGHBOUR_OFFSETS_EVEN
+	for step in [0, 1]:
+		var candidate = pos2d + offsets[wrapi(corner_index + step, 0, 6)]
+		if cells_2d.has(candidate):
+			for neighbour:HexCell in cells_2d[candidate]:
+				if neighbour.int_pos.y >= pos.y - down and neighbour.int_pos.y <= pos.y + up:
+					neighbours.append(neighbour)
+	return neighbours
+	
+
 func cell_mouse_motion(cell:HexCell, pos: Vector3) -> void:
 	#Calculate which 1/12 of the cell this is.
 	set_hovered_segment(get_hexagon_segment(cell, pos))
 
 func get_hexagon_segment(cell: HexCell, world_pos: Vector3) -> int:
 	var local_pos: Vector3 = cell.to_local(world_pos)
-	var angle: float = atan2(local_pos.z, local_pos.x)
-	if angle < 0:
-		angle += 2 * PI
-	return clampi(floor(12 * angle / TAU), 0, 11)
+	var angle: float = atan2(local_pos.z, local_pos.x) + (TAU / 12.0) + TAU
+	return clampi(floor(12 * fmod(angle / TAU, 1.0)), 0, 11)
 
 func cell_clicked(cell: HexCell, pos: Vector3, normal: Vector3) -> void:
 	battle.cell_clicked(cell, pos, normal)
