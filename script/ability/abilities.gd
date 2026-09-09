@@ -1,28 +1,22 @@
 # abilities.gd
 class_name Abilities
 
+static var blink_strike := Ability.new("blink_strike", "Blink Strike", 
+	"Slow around self, blink to target tile, damage units around landing location",
+	[Ability.Tag.MAGIC]) \
+	.with_input(AbilityInput.cell(4.0, 1)) \
+	.with_step(StepApplyEffects.new(StepApplyEffects.Anchor.CASTER, AOEShape.radial(1.5), [EffectApplyStatus.new("slow", 1)])) \
+	.with_step(StepMove.new()) \
+	.with_step(StepApplyEffects.new(StepApplyEffects.Anchor.INPUT, AOEShape.radial(1.5), [EffectDamage.new(20.0, Type.Damage.PHYSICAL)]))
+
 static var basic_move := Ability.new(
 	"basic_move", "Move",
 	"Move to a new tile",
 	[Ability.Tag.MOVEMENT]
 ) \
 .uses_per_turn(false) \
-#.with_input(AbilityInput.cell(func(ua: UnitAbility) -> float: return ua.unit.movement_points, 1, 1, 1, true, false)) \
-.with_input(AbilityInput.cell(Evaluator.new(Evaluator.Target.movement_points), 1, 1, 1, true, false)) \
-.with_execute(func(unit_ability:UnitAbility, input:Dictionary) -> void:
-	print("AbilityBase Move")
-	var start_cell := unit_ability.unit.current_cell
-	var target_cell : HexCell = input.target_cell
-	var battle = unit_ability.unit.battle
-	var path : Array[HexCell] = battle.grid.find_path(start_cell, target_cell, false)
-	if path.size() <= 1:
-		return
-	path.remove_at(0)
-	var sequence_tree = battle.new_sequence_tree(unit_ability, input)
-	for cell:HexCell in path:
-		var action = ActionMove.new(unit_ability, unit_ability.unit, cell)
-		sequence_tree.append_sequential_action(action)
-)
+.with_input(AbilityInput.cell(Evaluator.new(Evaluator.Target.movement_points), 1, 1, 1, true, false))
+# target_effects still TODO — needs EffectMove, which reads results[0].path instead of .units
 
 static var basic_attack := Ability.new(
 	"basic_attack", "Attack",
@@ -30,19 +24,53 @@ static var basic_attack := Ability.new(
 	[Ability.Tag.BASIC, Ability.Tag.ATTACK, Ability.Tag.MELEE]
 ) \
 .with_input(AbilityInput.unit(1.0, 1, 1, 1, false, true)) \
-.with_execute(func(unit_ability:UnitAbility, input:Dictionary) -> void:
-	print("AbilityBase Attack")
-	var battle = unit_ability.unit.battle
-	
-	var sequence_tree = battle.new_sequence_tree(unit_ability, input)
-	var action = ActionDynamic.new(unit_ability).with_function(func(_sequence_tree:SequenceTree, current_node:ActionNode, _saved_data:Dictionary) -> void:
-		#trigger attack start, etc, etc
-		var target_unit:Unit = _saved_data.target_unit
-		target_unit.apply_damage(unit_ability.unit.strength, Type.Damage.PHYSICAL, _sequence_tree, current_node)
-		return
-	, {target_unit = input.target_unit})
-	sequence_tree.append_sequential_action(action)
-)
+.with_target_effects([
+	EffectDamage.new(Evaluator.new(Evaluator.Target.strength), Type.Damage.PHYSICAL),
+])
+#
+#
+#static var basic_move := Ability.new(
+	#"basic_move", "Move",
+	#"Move to a new tile",
+	#[Ability.Tag.MOVEMENT]
+#) \
+#.uses_per_turn(false) \
+##.with_input(AbilityInput.cell(func(ua: UnitAbility) -> float: return ua.unit.movement_points, 1, 1, 1, true, false)) \
+#.with_input(AbilityInput.cell(Evaluator.new(Evaluator.Target.movement_points), 1, 1, 1, true, false)) \
+#.with_execute(func(unit_ability:UnitAbility, input:Dictionary) -> void:
+	#print("AbilityBase Move")
+	#var start_cell := unit_ability.unit.current_cell
+	#var target_cell : HexCell = input.target_cell
+	#var battle = unit_ability.unit.battle
+	#var path : Array[HexCell] = battle.grid.find_path(start_cell, target_cell, false)
+	#if path.size() <= 1:
+		#return
+	#path.remove_at(0)
+	#var sequence_tree = battle.new_sequence_tree(unit_ability, input)
+	#for cell:HexCell in path:
+		#var action = ActionMove.new(unit_ability, unit_ability.unit, cell)
+		#sequence_tree.append_sequential_action(action)
+#)
+#
+#static var basic_attack := Ability.new(
+	#"basic_attack", "Attack",
+	#"Attack a unit",
+	#[Ability.Tag.BASIC, Ability.Tag.ATTACK, Ability.Tag.MELEE]
+#) \
+#.with_input(AbilityInput.unit(1.0, 1, 1, 1, false, true)) \
+#.with_execute(func(unit_ability:UnitAbility, input:Dictionary) -> void:
+	#print("AbilityBase Attack")
+	#var battle = unit_ability.unit.battle
+	#
+	#var sequence_tree = battle.new_sequence_tree(unit_ability, input)
+	#var action = ActionDynamic.new(unit_ability).with_function(func(_sequence_tree:SequenceTree, current_node:ActionNode, _saved_data:Dictionary) -> void:
+		##trigger attack start, etc, etc
+		#var target_unit:Unit = _saved_data.target_unit
+		#target_unit.apply_damage(unit_ability.unit.strength, Type.Damage.PHYSICAL, _sequence_tree, current_node)
+		#return
+	#, {target_unit = input.target_unit})
+	#sequence_tree.append_sequential_action(action)
+#)
 
 #
 #static var fireball := AbilityBase.new(

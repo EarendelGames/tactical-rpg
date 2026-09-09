@@ -68,10 +68,10 @@ func get_int_pos() -> Vector3i:
 # --- Turn start ---
 
 func turn_start() -> void:
+	movement_points = max_movement_points
 	_tick_statuses()
 	if is_dead:
 		return
-	movement_points = max_movement_points
 	_reset_ability_uses()
 	_roll_ability_slots()
 

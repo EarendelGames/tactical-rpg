@@ -272,6 +272,12 @@ func get_neighbours_2d(cell: HexCell) -> Array[HexCell]:
 				neighbours.append(neighbour)
 	return neighbours
 
+func get_neighbour_in_direction(cell: HexCell, direction: int) -> HexCell:
+	var pos := cell.int_pos
+	var offsets := NEIGHBOUR_OFFSETS_ODD if (pos.z & 1) else NEIGHBOUR_OFFSETS_EVEN
+	var candidate := Vector3i(pos.x + offsets[direction].x, pos.y, pos.z + offsets[direction].y)
+	return get_cell_at(candidate)
+	
 # --- Reachability (BFS for movement) ---
 
 func get_reachable_cells(from_cell: HexCell, range_steps: float, allow_occupied = false) -> Array[HexCell]:

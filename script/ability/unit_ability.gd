@@ -89,16 +89,16 @@ func cell_clicked(cell: HexCell, _pos, _normal) -> void:
 				print("UnitAbility _on_unit_clicked")
 				unit.battle.clear_highlights()
 				unit.battle.set_input_consumer(null)
-				activate_ability({"target_unit" = cell.occupant, "target_cell" = cell})
+				activate_ability([AbilitySelectionResult.new().with_units([cell.occupant])])
 				return
 		else:
 			unit.battle.clear_highlights()
 			unit.battle.set_input_consumer(null)
-			activate_ability({"target_cell" = cell})
+			activate_ability([AbilitySelectionResult.new().with_cells([cell])])
 	else:
 		print("invalid cell")
 
-func activate_ability(resolved_inputs: Dictionary) -> void:
+func activate_ability(resolved_inputs: Array[AbilitySelectionResult]) -> void:
 	print("Battle activate_ability")
 	if unit.battle.sequence_tree != null:
 		push_warning("The current sequence tree must finish first")
@@ -108,4 +108,4 @@ func activate_ability(resolved_inputs: Dictionary) -> void:
 		return
 	unit.battle.sequence_tree = SequenceTree.new(unit.battle, self, resolved_inputs)
 	consume()
-	ability.execute(self, resolved_inputs)
+	ability.execute(self, resolved_inputs, unit.battle.sequence_tree)
