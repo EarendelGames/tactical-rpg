@@ -1,4 +1,4 @@
-# battle/sequence_tree.gd
+# sequence_tree.gd
 class_name SequenceTree
 
 const MAX_DEPTH := 8

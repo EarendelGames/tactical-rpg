@@ -141,7 +141,6 @@ func set_input_consumer(ua:UnitAbility) -> void:
 func cell_clicked(cell: HexCell, pos, normal) -> void:
 	selected_unit = null
 	if input_consumer:
-		print("a")
 		input_consumer.cell_clicked(cell, pos, normal)
 	else:
 		if cell.occupant:

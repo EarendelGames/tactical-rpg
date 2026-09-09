@@ -1,3 +1,4 @@
+# evaluator.gd
 class_name Evaluator
 
 var target: Target = Target.none 

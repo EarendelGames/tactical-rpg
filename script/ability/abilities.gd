@@ -1,3 +1,4 @@
+# abilities.gd
 class_name Abilities
 
 static var basic_move := Ability.new(

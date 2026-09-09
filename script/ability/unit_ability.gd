@@ -1,4 +1,4 @@
-# ability_instance.gd
+# unit_ability.gd
 class_name UnitAbility
 #This is an ability that exists on a character. It is not the "usage instace" of the ability - that's the sequence tree. 
 

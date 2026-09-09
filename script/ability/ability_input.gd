@@ -1,3 +1,4 @@
+# ability_input.gd
 class_name AbilityInput
 
 var selection_type: Selection.Type
