@@ -27,7 +27,7 @@ var is_dead: bool = false
 
 var strength: float = 3.0
 var dexterity: float = 3.0
-var destruction: float = 3.0
+var mysticism: float = 3.0
 
 var move_ability: UnitAbility
 var abilities: Array[UnitAbility] = []

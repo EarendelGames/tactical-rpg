@@ -6,7 +6,8 @@ static var basic_move := Ability.new(
 	[Ability.Tag.MOVEMENT]
 ) \
 .uses_per_turn(false) \
-.with_input(AbilityInput.cell(func(ua: UnitAbility) -> float: return ua.unit.movement_points, 1, 1, 1, true, false)) \
+#.with_input(AbilityInput.cell(func(ua: UnitAbility) -> float: return ua.unit.movement_points, 1, 1, 1, true, false)) \
+.with_input(AbilityInput.cell(Evaluator.new(Evaluator.Target.movement_points), 1, 1, 1, true, false)) \
 .with_execute(func(unit_ability:UnitAbility, input:Dictionary) -> void:
 	print("AbilityBase Move")
 	var start_cell := unit_ability.unit.current_cell

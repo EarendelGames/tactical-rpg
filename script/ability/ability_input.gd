@@ -39,21 +39,29 @@ static func direction() -> AbilityInput:
 
 
 func get_selection_range(unit_ability: UnitAbility) -> float:
+	if selection_range is Evaluator:
+		return selection_range.evaluate(unit_ability)
 	if selection_range is Callable:
 		return selection_range.call(unit_ability)
 	return selection_range
 
 func get_min_range(unit_ability: UnitAbility) -> float:
+	if min_range is Evaluator:
+		return min_range.evaluate(unit_ability)
 	if min_range is Callable:
 		return min_range.call(unit_ability)
 	return min_range
 
 func get_min_selections(unit_ability: UnitAbility) -> float:
+	if min_selections is Evaluator:
+		return min_selections.evaluate(unit_ability)
 	if min_selections is Callable:
 		return min_selections.call(unit_ability)
 	return min_selections
 
 func get_max_selections(unit_ability: UnitAbility) -> float:
+	if max_selections is Evaluator:
+		return max_selections.evaluate(unit_ability)
 	if max_selections is Callable:
 		return max_selections.call(unit_ability)
 	return max_selections
