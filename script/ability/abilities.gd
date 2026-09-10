@@ -1,22 +1,24 @@
 # abilities.gd
 class_name Abilities
-
-static var blink_strike := Ability.new("blink_strike", "Blink Strike", 
+	
+static var blink_strike := Ability.new("blink_strike", "Blink Strike",
 	"Slow around self, blink to target tile, damage units around landing location",
 	[Ability.Tag.MAGIC]) \
 	.with_input(AbilityInput.cell(4.0, 1)) \
-	.with_step(StepApplyEffects.new(StepApplyEffects.Anchor.CASTER, AOEShape.radial(1.5), [EffectApplyStatus.new("slow", 1)])) \
-	.with_step(StepMove.new()) \
-	.with_step(StepApplyEffects.new(StepApplyEffects.Anchor.INPUT, AOEShape.radial(1.5), [EffectDamage.new(20.0, Type.Damage.PHYSICAL)]))
+	.with_step(StepAutoselect.new().with_autoselect(AutoselectSelf.new())) \
+	.with_step(StepApplyEffects.new().use_phase(1) \
+		.with_transformer(AOETransformer.new(AOEShape.radial(1.5))) \
+		.with_effects([EffectApplyStatus.new("slow", 1)])) \
+	.with_step(StepApplyEffects.new() \
+		.with_effects([EffectMove.new()])) \
+	.with_step(StepApplyEffects.new() \
+		.with_transformer(AOETransformer.new(AOEShape.radial(1.5))) \
+		.with_effects([EffectDamage.new(5.0, Type.Damage.ASTRAL)]))
 
-static var basic_move := Ability.new(
-	"basic_move", "Move",
-	"Move to a new tile",
-	[Ability.Tag.MOVEMENT]
-) \
-.uses_per_turn(false) \
-.with_input(AbilityInput.cell(Evaluator.new(Evaluator.Target.movement_points), 1, 1, 1, true, false))
-# target_effects still TODO — needs EffectMove, which reads results[0].path instead of .units
+static var basic_move := Ability.new("basic_move", "Move", "Move to a new tile", [Ability.Tag.MOVEMENT]) \
+	.uses_per_turn(false) \
+	.with_input(AbilityInput.cell(Evaluator.new(Evaluator.Target.movement_points), 1, 1, 1, true, false)) \
+	.with_step(StepApplyEffects.new().with_transformer(AOETransformer.new(AOEShape.path())).with_effects([EffectMove.new()]))
 
 static var basic_attack := Ability.new(
 	"basic_attack", "Attack",

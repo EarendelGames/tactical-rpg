@@ -43,8 +43,8 @@ enum CursorMode { CELL, EDGE, CORNER }
 var _cursor_mode: CursorMode = CursorMode.CELL
 var _hovered_cell: HexCell
 var _hovered_segment: int
-#TODO: also add hovered segment, which 1/12 of the cell is hovered,
-# so that the information can be used for edge and corner modes.
+
+var _hover_counter: int = 0
 
 # --- Registration ---
 
@@ -77,6 +77,7 @@ func _pos_key(int_pos: Vector3i) -> String:
 
 func pos_2d(int_pos: Vector3i) -> Vector2i:
 	return Vector2i(int_pos.x, int_pos.z)
+
 # --- Coordinate conversion ---
 
 func int_to_world(int_pos: Vector3i) -> Vector3:
@@ -147,6 +148,8 @@ func get_cell_at(int_pos: Vector3i) -> HexCell:
 func set_hovered_cell(cell:HexCell) -> void:
 	if _hovered_cell != cell:
 		_hovered_cell = cell
+		_hover_counter += 1
+		_hovered_cell.last_hover = _hover_counter
 		_on_hovered_state_changed()
 
 func unset_hovered_cell(cell:HexCell) -> void:
@@ -279,12 +282,12 @@ func get_neighbour_in_direction(cell: HexCell, direction: int) -> HexCell:
 	return get_cell_at(candidate)
 	
 # --- Reachability (BFS for movement) ---
-
-func get_reachable_cells(from_cell: HexCell, range_steps: float, allow_occupied = false) -> Array[HexCell]:
-	var reachable: Array[HexCell] = []
-	var visited: Dictionary = {}
+func get_reachable_cells(from_cell: HexCell, range_steps: float, allow_occupied = false) -> Dictionary:
+	var best_remaining: Dictionary = {}   # int_pos -> float
+	var predecessors: Dictionary = {}     # int_pos -> Array[HexCell]
+	var cell_lookup: Dictionary = {}      # int_pos -> HexCell
 	var queue: Array = []
-	visited[from_cell.int_pos] = true
+	best_remaining[from_cell.int_pos] = range_steps
 	queue.append([from_cell, range_steps])
 
 	while queue.size() > 0:
@@ -295,25 +298,31 @@ func get_reachable_cells(from_cell: HexCell, range_steps: float, allow_occupied 
 		for neighbour in get_neighbours(cell):
 			if neighbour.occupant and not allow_occupied:
 				continue
-			if visited.has(neighbour.int_pos):
-				continue
 			if abs(neighbour.int_pos.y - cell.int_pos.y) > 1:
 				continue
 			var cost: float = neighbour.movement_cost
-			var is_adjacent_to_start := cell == from_cell
 			var effective_cost := cost
 			if cost > points:
-				if is_adjacent_to_start and points >= 1:
+				if cell == from_cell and points >= 1:
 					effective_cost = points
 				else:
 					continue
-			visited[neighbour.int_pos] = true
-			reachable.append(neighbour)
 			var remaining := points - effective_cost
-			if remaining > 0:
-				queue.append([neighbour, remaining])
+			var key := neighbour.int_pos
+			if not best_remaining.has(key) or remaining > best_remaining[key]:
+				best_remaining[key] = remaining
+				predecessors[key] = [cell]
+				cell_lookup[key] = neighbour
+				if remaining > 0:
+					queue.append([neighbour, remaining])
+			elif remaining == best_remaining[key] and not predecessors[key].has(cell):
+				predecessors[key].append(cell)
 
-	return reachable
+	predecessors.erase(from_cell.int_pos)
+	var result: Dictionary = {}
+	for key in predecessors:
+		result[cell_lookup[key]] = predecessors[key]
+	return result
 
 # --- Radius expansion ---
 func get_cells_in_radius(origin: HexCell, radius: float, vertical_buffer:int = 0) -> Array[HexCell]:

@@ -138,7 +138,7 @@ func is_movement() -> bool:
 func is_basic() -> bool:
 	return Ability.Tag.BASIC in tags
 
-func execute(unit_ability: UnitAbility, results: Array[AbilitySelectionResult], tree: SequenceTree) -> void:
+func execute(unit_ability: UnitAbility, results: AbilitySelectionResults, tree: SequenceTree) -> void:
 	if _execute_fn.is_valid():
 		return _execute_fn.call(unit_ability, results)
 		

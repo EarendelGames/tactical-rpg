@@ -2,23 +2,30 @@
 class_name StepApplyEffects
 extends AbilityStep
 
-enum Anchor { CASTER, INPUT }
-
-var anchor: Anchor
-var aoe_shape: AOEShape          # null = just use results[input_index].units directly
+# step_auto_select.gd
+var phase_index: int = 0
+var transformer: TargetTransformer   # null = identity
 var effects: Array[AbilityEffect]
-var input_index: int = 0
 
-func _init(p_anchor: Anchor, p_aoe_shape: AOEShape, p_effects: Array[AbilityEffect], p_input_index := 0) -> void:
-	anchor = p_anchor; aoe_shape = p_aoe_shape; effects = p_effects; input_index = p_input_index
+func build_actions(unit_ability: UnitAbility, results: AbilitySelectionResults, tree: SequenceTree) -> void:
+	var phase_selections: Array[AbilitySelectionResult] = results.get_phase(phase_index)
+	for selection: AbilitySelectionResult in phase_selections:
+		var cells: Array[HexCell] = transformer.get_cells(unit_ability, selection) if transformer else [selection.cell]
+		for cell in cells:
+			var actions: Array[ActionNode] = []
+			for effect in effects:
+				actions.append(ActionEffect.new(unit_ability, effect, cell))
+			tree.append_sequential_action(actions[0] if actions.size() == 1 else ActionSequence.new(unit_ability, actions))
+			
 
-func build_actions(unit_ability: UnitAbility, results: Array[AbilitySelectionResult], tree: SequenceTree) -> void:
-	var targets: Array[Unit] = []
-	if aoe_shape:
-		var anchor_cell: HexCell = unit_ability.unit.current_cell if anchor == Anchor.CASTER else results[input_index].cells[0]
-		for cell in aoe_shape.get_cells(unit_ability.unit.battle.grid, unit_ability.unit.current_cell, anchor_cell):
-			if cell.occupant:
-				targets.append(cell.occupant)
-	else:
-		targets = results[input_index].units
-	tree.append_sequential_action(ActionUnitEffects.new(unit_ability, targets, effects))
+func with_transformer(p_transformer: TargetTransformer) -> StepApplyEffects:
+	transformer = p_transformer
+	return self
+	
+func with_effects(p_effects: Array[AbilityEffect]) -> StepApplyEffects:
+	effects = p_effects
+	return self
+
+func use_phase(_phase_index:int) -> StepApplyEffects:
+	phase_index = _phase_index
+	return self

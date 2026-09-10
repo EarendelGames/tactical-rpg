@@ -4,14 +4,14 @@ class_name SequenceTree
 const MAX_DEPTH := 8
 
 var instigating_ability: UnitAbility
-var input_results: Array[AbilitySelectionResult] # Input can be a unit, tile, tile corner, tile edge, or vector.
+var input_results: AbilitySelectionResults # Input can be a unit, tile, tile corner, tile edge, or vector.
 var triggered_events: Array[EventNode] = []
 var immediate_actions: Array[ActionNode] = []
 var sequential_actions: Array[ActionNode] = []
 var processed_actions: Array[ActionNode] = []
 var battle: Battle
 
-func _init(p_battle: Battle, p_instigator: UnitAbility, p_inputs: Array[AbilitySelectionResult]) -> void:
+func _init(p_battle: Battle, p_instigator: UnitAbility, p_inputs: AbilitySelectionResults) -> void:
 	battle = p_battle
 	instigating_ability = p_instigator
 	input_results = p_inputs

@@ -9,6 +9,9 @@ func _init(p_amount, p_damage_type: Type.Damage) -> void:
 	amount = p_amount
 	damage_type = p_damage_type
 
-func apply(unit_ability: UnitAbility, target: Unit, tree: SequenceTree, node: ActionNode) -> void:
+func apply_to_cell(unit_ability: UnitAbility, cell: HexCell, tree: SequenceTree, node: ActionNode) -> bool:
+	if not cell.occupant:
+		return false
 	var value: float = amount.evaluate(unit_ability) if amount is Evaluator else amount
-	target.apply_damage(value, damage_type, tree, node)
+	cell.occupant.apply_damage(value, damage_type, tree, node)
+	return true

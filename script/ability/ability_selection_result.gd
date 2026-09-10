@@ -3,23 +3,23 @@ extends RefCounted
 
 # It is a selection result, not an input result, becuase passive abilties and trigers may auto-select.
 
-var input_phase: AbilityInput        # which phase this came from, if any
-var cells: Array[HexCell] = []
-var units: Array[Unit] = []
-var path: Array[HexCell] = []        # populated only if input_phase.require_path
+# one phase's worth of selections
+# results: Array[Array[AbilitySelectionResult]]
+# results[phase_index] = Array[AbilitySelectionResult]   (multiple only if that phase allows multi-select)
 
-func with_cells(_cells: Array[HexCell]) -> AbilitySelectionResult:
-	cells = _cells
+var cell: HexCell           # the clicked/targeted cell (or the unit's cell, if unit-type selection)
+var unit: Unit               # null unless selection_type == UNIT
+var path: Array[HexCell] = []       # empty unless this selection used pathfinding
+var direction: int = 0              # edge index 0-5; caster->cell by default, overridable via rotation
+
+func with_cell(_cell: HexCell) -> AbilitySelectionResult:
+	cell = _cell
 	return self
-	
-func with_units(_units: Array[Unit]) -> AbilitySelectionResult:
-	units = _units
+
+func with_unit(_unit: Unit) -> AbilitySelectionResult:
+	unit = _unit
 	return self
-	
+
 func with_path(_path: Array[HexCell]) -> AbilitySelectionResult:
 	path = _path
-	return self
-	
-func for_input_phase(_input_phase: AbilityInput) -> AbilitySelectionResult:
-	input_phase = _input_phase
 	return self

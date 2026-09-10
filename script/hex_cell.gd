@@ -38,6 +38,7 @@ enum Edge { NONE = 0, E0 = 1, E1 = 2, E2 = 4, E3 = 8, E4 = 16, E5 = 32, ALL = 63
 var cursor_cell_highlight: bool = false
 var cursor_edge_highlight: int = -1   # 0-5, -1 = off
 var cursor_corner_highlight: int = -1 # 0-5, -1 = off
+var last_hover: int = -1 # Updated on set_hovered_cell
 
 # Shared across every HexCell instance so they all draw with one material and
 # differ only via per-instance shader parameters.

@@ -179,7 +179,7 @@ func _find_closest_open_cell(world_pos: Vector3) -> HexCell:
 			best_cell = cell
 	return best_cell
 
-func new_sequence_tree(unit_ability:UnitAbility, inputs:Array[AbilitySelectionResult]) -> SequenceTree:
+func new_sequence_tree(unit_ability:UnitAbility, inputs:AbilitySelectionResults) -> SequenceTree:
 	sequence_tree = SequenceTree.new(self, unit_ability, inputs)
 	return sequence_tree
 

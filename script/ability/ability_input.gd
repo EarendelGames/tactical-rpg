@@ -38,6 +38,11 @@ static func cell_corner(p_selection_range: Variant, p_min_range: Variant, p_min_
 static func direction() -> AbilityInput:
 	return AbilityInput.new(Selection.Type.DIRECTION)
 
+func resolve_direction(grid: GridHandler, caster_cell: HexCell, target_cell: HexCell, override_direction: int = -1) -> int:
+	if override_direction >= 0:
+		return override_direction
+	var segment := grid.get_hexagon_segment(caster_cell, target_cell.global_position)
+	return grid.get_edge_index_from_segment(segment)
 
 func get_selection_range(unit_ability: UnitAbility) -> float:
 	if selection_range is Evaluator:

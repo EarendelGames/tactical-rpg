@@ -6,6 +6,7 @@ var unit:Unit # the owning unit
 var ability: Ability
 var uses_remaining: int = 1
 var valid_cells: Array[HexCell] = []
+var _path_predecessors: Dictionary = {}   # HexCell -> Array[HexCell], empty when not path-based
 
 func _init(_ability: Ability, _unit:Unit) -> void:
 	ability = _ability
@@ -52,53 +53,59 @@ func range_highlight(cells = null) -> void:
 		cell.set_range_layer(Color(1.0, 0.9, 0.0, 0.5), HexCell.Edge.ALL)
 
 func get_reachable_cells() -> Array[HexCell]:
-	var collect_cells: Array[HexCell]
-	var reachable_cells: Array[HexCell]
-	
-	# consider moving to ability_input
-	var input_phase:AbilityInput = ability.inputs[0] #only consider the first phase for now
+	var input_phase: AbilityInput = ability.inputs[0]
 	var selection_range = input_phase.get_selection_range(self)
 	var min_range = input_phase.get_min_range(self)
-	
+	var collect_cells: Array[HexCell]
+
+	_path_predecessors = {}
 	if input_phase.selection_type == Selection.Type.CELL:
 		if input_phase.require_path:
-			collect_cells = unit.battle.grid.get_reachable_cells(unit.current_cell, selection_range, false)
+			_path_predecessors = unit.battle.grid.get_reachable_cells(unit.current_cell, selection_range, false)
+			collect_cells.assign(_path_predecessors.keys())
 		else:
 			collect_cells = unit.battle.grid.get_cells_in_radius(unit.current_cell, selection_range, 1)
-	
 	if input_phase.selection_type == Selection.Type.UNIT:
 		collect_cells = unit.battle.grid.get_cells_in_radius(unit.current_cell, selection_range, 1)
-	
-	#Enforce minimum range
-	for cell:HexCell in collect_cells:
+
+	var reachable_cells: Array[HexCell] = []
+	for cell: HexCell in collect_cells:
 		if GridHandler.get_cell_distance(unit.current_cell.int_pos, cell.int_pos) >= min_range:
 			reachable_cells.append(cell)
-	
 	return reachable_cells
 	
+func get_path_to(cell: HexCell) -> Array[HexCell]:
+	var path: Array[HexCell] = [cell]
+	var current := cell
+	while _path_predecessors.has(current):
+		var candidates: Array = _path_predecessors[current]
+		var best: HexCell = candidates[0]
+		for c in candidates:
+			if c.last_hover > best.last_hover:
+				best = c
+		path.push_front(best)
+		current = best
+	return path
 
 func cell_clicked(cell: HexCell, _pos, _normal) -> void:
-	print("UnitAbility _on_cell_clicked")
-	if valid_cells.has(cell):
-		var input_phase:AbilityInput = ability.inputs[0] #only consider the first phase for now
-		if input_phase.selection_type == Selection.Type.UNIT:
-			if cell.occupant:
-				if not cell.occupant:
-					print("No occupant")
-					return
-				print("UnitAbility _on_unit_clicked")
-				unit.battle.clear_highlights()
-				unit.battle.set_input_consumer(null)
-				activate_ability([AbilitySelectionResult.new().with_units([cell.occupant])])
-				return
-		else:
+	if not valid_cells.has(cell):
+		print("invalid cell")
+		return
+	var input_phase: AbilityInput = ability.inputs[0]
+	if input_phase.selection_type == Selection.Type.UNIT:
+		if cell.occupant:
 			unit.battle.clear_highlights()
 			unit.battle.set_input_consumer(null)
-			activate_ability([AbilitySelectionResult.new().with_cells([cell])])
-	else:
-		print("invalid cell")
+			activate_ability(AbilitySelectionResults.new().add_phase([AbilitySelectionResult.new().with_unit(cell.occupant)]))
+		return
+	var result := AbilitySelectionResult.new().with_cell(cell)
+	if not _path_predecessors.is_empty():
+		result.with_path(get_path_to(cell))
+	unit.battle.clear_highlights()
+	unit.battle.set_input_consumer(null)
+	activate_ability(AbilitySelectionResults.new().add_phase([result]))
 
-func activate_ability(resolved_inputs: Array[AbilitySelectionResult]) -> void:
+func activate_ability(resolved_inputs: AbilitySelectionResults) -> void:
 	print("Battle activate_ability")
 	if unit.battle.sequence_tree != null:
 		push_warning("The current sequence tree must finish first")

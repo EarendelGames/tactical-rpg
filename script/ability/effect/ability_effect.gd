@@ -2,5 +2,6 @@
 class_name AbilityEffect
 extends RefCounted
 
-func apply(unit_ability: UnitAbility, target: Unit, tree: SequenceTree, node: ActionNode) -> void:
-	push_error("AbilityEffect.apply not implemented")
+func apply_to_cell(unit_ability: UnitAbility, cell: HexCell, tree: SequenceTree, node: ActionNode) -> bool:
+	push_error("not implemented")
+	return false
