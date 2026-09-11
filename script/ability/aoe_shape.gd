@@ -9,7 +9,7 @@ var offsets: Array[Vector3i] = []   # for OFFSETS
 var param: Variant = 0              # radius / length, float or Evaluator
 var width: Variant = 0              # for LINE/CONE
 var vertical_buffer: int = 0        # passed straight to get_cells_in_radius
-var include_start: bool = false
+var exclude_first: int = 0          # skip early cells
 
 static func single() -> AOEShape:
 	var s := AOEShape.new(); s.kind = Kind.SINGLE; return s
@@ -17,30 +17,30 @@ static func single() -> AOEShape:
 static func offsets_shape(list: Array[Vector3i]) -> AOEShape:
 	var s := AOEShape.new(); s.kind = Kind.OFFSETS; s.offsets = list; return s
 
-static func radial(radius: Variant, p_vertical_buffer: int = 0) -> AOEShape:
-	var s := AOEShape.new(); s.kind = Kind.RADIAL; s.param = radius; s.vertical_buffer = p_vertical_buffer; return s
+static func radial(radius: Variant, p_vertical_buffer: int = 0, p_exclude_first: bool = 0) -> AOEShape:
+	var s := AOEShape.new(); s.kind = Kind.RADIAL; s.param = radius; s.vertical_buffer = p_vertical_buffer; s.exclude_first = p_exclude_first; return s
 
-static func flood(radius: Variant) -> AOEShape:
-	var s := AOEShape.new(); s.kind = Kind.FLOOD; s.param = radius; return s
+static func flood(radius: Variant, p_exclude_first: bool = 0) -> AOEShape:
+	var s := AOEShape.new(); s.kind = Kind.FLOOD; s.param = radius; s.exclude_first = p_exclude_first; return s
 
-static func line(length: Variant, p_width: Variant = 0) -> AOEShape:
-	var s := AOEShape.new(); s.kind = Kind.LINE; s.param = length; s.width = p_width; return s
+static func line(length: Variant, p_width: Variant = 0, p_exclude_first: bool = 0) -> AOEShape:
+	var s := AOEShape.new(); s.kind = Kind.LINE; s.param = length; s.width = p_width; s.exclude_first = p_exclude_first; return s
 	
-static func cone(length: Variant, p_width: Variant = 0) -> AOEShape:
-	var s := AOEShape.new(); s.kind = Kind.CONE; s.param = length; s.width = p_width; return s
+static func cone(length: Variant, p_width: Variant = 0, p_exclude_first: bool = 0) -> AOEShape:
+	var s := AOEShape.new(); s.kind = Kind.CONE; s.param = length; s.width = p_width; s.exclude_first = p_exclude_first; return s
 	
-static func path(p_width: Variant = 0, p_include_start: bool = false) -> AOEShape:
-	var s := AOEShape.new(); s.kind = Kind.PATH; s.width = p_width; s.include_start = p_include_start; return s
+static func path(p_width: Variant = 0, p_exclude_first: bool = 0) -> AOEShape:
+	var s := AOEShape.new(); s.kind = Kind.PATH; s.width = p_width; s.exclude_first = p_exclude_first; return s
 
 func get_cells(grid: GridHandler, selection: AbilitySelectionResult, unit_ability: UnitAbility = null) -> Array[HexCell]:
 	match kind:
 		Kind.SINGLE:  return [selection.cell]
 		Kind.OFFSETS: return _offset_cells(grid, selection.cell)
-		Kind.RADIAL:  return grid.get_cells_in_radius(selection.cell, _eval(param, unit_ability), vertical_buffer)
-		Kind.FLOOD:   return grid.get_cells_in_flood_radius(selection.cell, _eval(param, unit_ability))
+		Kind.RADIAL:  return _radial_cells(grid, selection.cell, _eval(param, unit_ability))
+		Kind.FLOOD:   return _flood_cells(grid, selection.cell, _eval(param, unit_ability))
 		Kind.LINE:    return _line_cells(grid, selection.cell, selection.direction, _eval(param, unit_ability))
 		Kind.CONE:    return _cone_cells(grid, selection.cell, selection.direction, _eval(param, unit_ability), _eval(width, unit_ability))
-		Kind.PATH:    return _path_cells(grid, selection.path, _eval(width, unit_ability), include_start)
+		Kind.PATH:    return _path_cells(grid, selection.path, _eval(width, unit_ability))
 	return []
 
 func _eval(v: Variant, unit_ability: UnitAbility) -> float:
@@ -57,6 +57,29 @@ func _offset_cells(grid: GridHandler, anchor: HexCell) -> Array[HexCell]:
 func _nearest_direction(grid: GridHandler, from_cell: HexCell, target_world_pos: Vector3) -> int:
 	var segment := grid.get_hexagon_segment(from_cell, target_world_pos)
 	return grid.get_edge_index_from_segment(segment)
+	
+func _radial_cells(grid: GridHandler, anchor: HexCell, radius: float) -> Array[HexCell]:
+	var cells: Array[HexCell] = grid.get_cells_in_radius(anchor, radius, vertical_buffer)
+	if exclude_first > 0:
+		print("starting cell: ", anchor.int_pos)
+		print("cells: ", cells.size())
+		var cells_exlude: Array[HexCell] = grid.get_cells_in_radius(anchor, exclude_first - 0.5, vertical_buffer)
+		print("cells_exlude: ", cells_exlude.size())
+		for cell in cells_exlude:
+			var i = cells.find(cell)
+			if i >= 0:
+				cells.remove_at(i)
+	return cells
+	
+func _flood_cells(grid: GridHandler, anchor: HexCell, radius: float) -> Array[HexCell]:
+	var cells: Array[HexCell] =  grid.get_cells_in_flood_radius(anchor, radius)
+	if exclude_first > 0:
+		var cells_exlude: Array[HexCell] = grid.get_cells_in_flood_radius(anchor, exclude_first - 0.5)
+		for cell in cells_exlude:
+			var i = cells.find(cell)
+			if i > 0:
+				cells.remove_at(i)
+	return cells
 	
 func _line_cells(grid: GridHandler, anchor: HexCell, direction, length: float) -> Array[HexCell]:
 	var result: Array[HexCell] = []
@@ -84,8 +107,10 @@ func _cone_cells(grid: GridHandler, anchor: HexCell, direction, length: float, w
 		frontier = next_frontier
 	return result
 
-func _path_cells(grid: GridHandler, selected_path: Array[HexCell], _width: float, include_start: bool) -> Array[HexCell]:
-	var steps: Array[HexCell] = path if include_start else selected_path.slice(1)
+func _path_cells(grid: GridHandler, selected_path: Array[HexCell], _width: float) -> Array[HexCell]:
+	var steps: Array[HexCell] = selected_path
+	if exclude_first > 0:
+		steps = steps.slice(exclude_first)
 	if selected_path.size() == 0:
 		push_error("aoe_shape path was give a path of size 0")
 	if width <= 0.0:

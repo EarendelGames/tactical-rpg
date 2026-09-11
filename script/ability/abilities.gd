@@ -7,12 +7,12 @@ static var blink_strike := Ability.new("blink_strike", "Blink Strike",
 	.with_input(AbilityInput.cell(4.0, 1)) \
 	.with_step(StepAutoselect.new().with_autoselect(AutoselectSelf.new())) \
 	.with_step(StepApplyEffects.new().use_phase(1) \
-		.with_transformer(AOETransformer.new(AOEShape.radial(1.5))) \
+		.with_transformer(AOETransformer.new(AOEShape.radial(1.5, 1, 1))) \
 		.with_effects([EffectApplyStatus.new("slow", 1)])) \
 	.with_step(StepApplyEffects.new() \
 		.with_effects([EffectMove.new()])) \
 	.with_step(StepApplyEffects.new() \
-		.with_transformer(AOETransformer.new(AOEShape.radial(1.5))) \
+		.with_transformer(AOETransformer.new(AOEShape.radial(1.5, 1, 1))) \
 		.with_effects([EffectDamage.new(5.0, Type.Damage.ASTRAL)]))
 
 static var basic_move := Ability.new("basic_move", "Move", "Move to a new tile", [Ability.Tag.MOVEMENT]) \
