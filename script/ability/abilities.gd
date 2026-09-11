@@ -26,9 +26,8 @@ static var basic_attack := Ability.new(
 	[Ability.Tag.BASIC, Ability.Tag.ATTACK, Ability.Tag.MELEE]
 ) \
 .with_input(AbilityInput.unit(1.0, 1, 1, 1, false, true)) \
-.with_target_effects([
-	EffectDamage.new(Evaluator.new(Evaluator.Target.strength), Type.Damage.PHYSICAL),
-])
+.with_step(StepApplyEffects.new() \
+	.with_effects([EffectDamage.new(Evaluator.new(Evaluator.Target.strength), Type.Damage.PHYSICAL)]))
 #
 #
 #static var basic_move := Ability.new(

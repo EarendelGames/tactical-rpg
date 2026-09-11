@@ -54,7 +54,6 @@ var name: String
 var description: String
 var tags: Array[Ability.Tag]
 var inputs: Array[AbilityInput]
-var target_effects: Array[AbilityEffect] = []
 
 var cost_mana: float = 0.0
 var cost_movement: float = 0.0
@@ -67,9 +66,6 @@ var _trigger_fn: Callable
 
 var steps: Array[AbilityStep] = []
 
-func with_step(step: AbilityStep) -> Ability:
-	steps.append(step)
-	return self
 
 		
 # --- Init and registration ---
@@ -116,16 +112,16 @@ func uses_per_turn(value: Variant) -> Ability:
 		max_uses_per_turn = value
 	return self
 
-func with_target_effects(effects: Array[AbilityEffect]) -> Ability:
-	target_effects = effects
-	return self
-
 func with_execute(fn: Callable) -> Ability:
 	_execute_fn = fn
 	return self
 
 func with_trigger(fn: Callable) -> Ability:
 	_trigger_fn = fn
+	return self
+
+func with_step(step: AbilityStep) -> Ability:
+	steps.append(step)
 	return self
 
 # --- Runtime ---

@@ -10,7 +10,9 @@ var effects: Array[AbilityEffect]
 func build_actions(unit_ability: UnitAbility, results: AbilitySelectionResults, tree: SequenceTree) -> void:
 	var phase_selections: Array[AbilitySelectionResult] = results.get_phase(phase_index)
 	for selection: AbilitySelectionResult in phase_selections:
-		var cells: Array[HexCell] = transformer.get_cells(unit_ability, selection) if transformer else [selection.cell]
+		var cells: Array[HexCell] = [selection.cell]
+		if transformer:
+			cells = transformer.get_cells(unit_ability, selection)
 		for cell in cells:
 			var actions: Array[ActionNode] = []
 			for effect in effects:

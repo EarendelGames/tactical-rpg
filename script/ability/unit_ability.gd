@@ -96,6 +96,8 @@ func cell_clicked(cell: HexCell, _pos, _normal) -> void:
 		if cell.occupant:
 			unit.battle.clear_highlights()
 			unit.battle.set_input_consumer(null)
+			# Important: Unit should be converted to HexCell at the last possible moment so that it can track if the unit was moved mid ability.
+			# So only set the unit selection, NOT the initial hex cell
 			activate_ability(AbilitySelectionResults.new().add_phase([AbilitySelectionResult.new().with_unit(cell.occupant)]))
 		return
 	var result := AbilitySelectionResult.new().with_cell(cell)

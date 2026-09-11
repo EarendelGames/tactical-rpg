@@ -65,6 +65,7 @@ func _advance_to_next_turn() -> void:
 	print("Turn: %s (initiative %.2f)" % [current_unit.unit_name, current_unit.initiative])
 	current_unit.turn_start()
 	current_unit.move_ability.prep_for_input()
+	battle_ui.update_ui()
 
 func _on_round_end() -> void:
 	pass # TODO: environmental effects - fire spread, water flow, etc.
@@ -80,6 +81,7 @@ func _process(delta: float) -> void:
 			var unit := get_current_unit()
 			if unit and unit.movement_points > 0:
 				unit.move_ability.prep_for_input()
+		battle_ui.update_ui()
 
 # --- Movement ---
 func place_on_cell(unit:Unit, cell: HexCell) -> void:
@@ -137,6 +139,7 @@ func clear_highlights() -> void:
 
 func set_input_consumer(ua:UnitAbility) -> void:
 	input_consumer = ua
+	battle_ui.update_ui()
 
 func cell_clicked(cell: HexCell, pos, normal) -> void:
 	selected_unit = null

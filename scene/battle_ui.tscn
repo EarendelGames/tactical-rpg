@@ -60,17 +60,18 @@ layout_direction = 1
 layout_mode = 2
 text = "10"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="BL/VBoxContainer" unique_id=959819758]
+[node name="ActionsContainer" type="HBoxContainer" parent="BL/VBoxContainer" unique_id=959819758]
+unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 
-[node name="MoveAction" type="Button" parent="BL/VBoxContainer/HBoxContainer2" unique_id=1097398163]
+[node name="MoveAction" type="Button" parent="BL/VBoxContainer/ActionsContainer" unique_id=1097398163]
 unique_name_in_owner = true
 layout_direction = 1
 layout_mode = 2
 text = "Move"
 
-[node name="MainAction" type="Button" parent="BL/VBoxContainer/HBoxContainer2" unique_id=1306603649]
+[node name="MainAction" type="Button" parent="BL/VBoxContainer/ActionsContainer" unique_id=1306603649]
 unique_name_in_owner = true
 layout_direction = 1
 layout_mode = 2

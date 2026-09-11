@@ -56,6 +56,7 @@ func update_overhead_ui() -> void:
 func setup_abilities() -> void:
 	move_ability = Abilities.basic_move.as_unit_ability(self)
 	abilities.append(Abilities.basic_attack.as_unit_ability(self))
+	abilities.append(Abilities.blink_strike.as_unit_ability(self))
 
 func roll_initiative() -> void:
 	initiative = randf_range(0.0, 10.0) + initiative_modifier
@@ -167,6 +168,7 @@ func has_status(id: String) -> bool:
 	return get_status(id) != null
 
 func apply_status(id: String, stacks: int, data: Dictionary = {}) -> void:
+	print("Applying status ", id)
 	var existing := get_status(id)
 	if existing:
 		existing.stacks += stacks
