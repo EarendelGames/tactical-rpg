@@ -61,7 +61,7 @@ func get_reachable_cells() -> Array[HexCell]:
 	_path_predecessors = {}
 	if input_phase.selection_type == Selection.Type.CELL:
 		if input_phase.require_path:
-			_path_predecessors = unit.battle.grid.get_reachable_cells(unit.current_cell, selection_range, false)
+			_path_predecessors = unit.battle.grid.get_reachable_cells_paths(unit.current_cell, selection_range, false)
 			collect_cells.assign(_path_predecessors.keys())
 		else:
 			collect_cells = unit.battle.grid.get_cells_in_radius(unit.current_cell, selection_range, 1)

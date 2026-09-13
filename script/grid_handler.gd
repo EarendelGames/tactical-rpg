@@ -281,8 +281,8 @@ func get_neighbour_in_direction(cell: HexCell, direction: int) -> HexCell:
 	var candidate := Vector3i(pos.x + offsets[direction].x, pos.y, pos.z + offsets[direction].y)
 	return get_cell_at(candidate)
 	
-# --- Reachability (BFS for movement) ---
-func get_reachable_cells(from_cell: HexCell, range_steps: float, allow_occupied = false) -> Dictionary:
+# --- Reachability (BFS for movement, abilities, etc) ---
+func get_reachable_cells_paths(from_cell: HexCell, range_steps: float, allow_occupied = false) -> Dictionary:
 	var best_remaining: Dictionary = {}   # int_pos -> float
 	var predecessors: Dictionary = {}     # int_pos -> Array[HexCell]
 	var cell_lookup: Dictionary = {}      # int_pos -> HexCell
