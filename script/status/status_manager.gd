@@ -1,31 +1,12 @@
 # status_manager.gd
 class_name StatusManager
 
-# --- Registry ---
-
-static var _registry: Dictionary = {}
-
-static func register(status: StatusBase) -> StatusBase:
-	if _registry.has(status.id):
-		push_error("StatusBase: duplicate id '%s'" % status.id)
-	_registry[status.id] = status
-	return status
-
-static func get_status(status_id: String) -> StatusBase:
-	if not _registry.has(status_id):
-		push_error("StatusBase: unknown id '%s'" % status_id)
-	return _registry.get(status_id, null)
-
-static func all() -> Array:
-	return _registry.values()
-	
-
 # status_base.gd — additions
 static func apply_status(statuses: Dictionary, id: String, magnitude: int, duration: int = -1, source: UnitAbility = null) -> void:
 	return apply_status_stack(statuses, id, StatusStack.new(magnitude, duration, source))
 	
 static func apply_status_stack(statuses: Dictionary, id: String, incoming: StatusStack) -> void:
-	var status := StatusManager.get_status(id)
+	var status := Statuses.get_status(id)
 	var surviving: Array[StatusStack] = [incoming]
 
 	for opposing_id in status.opposes:

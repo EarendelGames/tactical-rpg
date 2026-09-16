@@ -8,7 +8,7 @@ func _init(p_id: String) -> void:
 	status_id = p_id
 
 func get_status() -> StatusBase:
-	return StatusManager.get_status(status_id)
+	return Statuses.get_status(status_id)
 
 func get_total_magnitude() -> int:
 	var sum: int = 0

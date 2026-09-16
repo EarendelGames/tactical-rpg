@@ -1,5 +1,5 @@
 # status_base.gd
-class_name StatusBase
+class_name StatusBase extends RefCounted
 
 var id: String
 var name: String
@@ -10,7 +10,8 @@ func _init(p_id: String, p_name: String, p_description: String) -> void:
 	id = p_id
 	name = p_name
 	description = p_description
-	StatusManager.register(self)
+	print("adding status ", p_id)
+	Statuses._registry[id] = self
 
 func on_turn_start(_unit: Unit, _instance: StatusInstance) -> void:
 	pass

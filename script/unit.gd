@@ -42,7 +42,6 @@ var _setup_triggers: Array = []
 var battle: Battle = null
 @onready var overhead_ui: OverheadUI = $OverheadUI
 
-
 func _ready() -> void:
 	if not Engine.is_editor_hint():
 		health = max_health
@@ -84,7 +83,7 @@ func _reset_ability_uses() -> void:
 func _tick_statuses() -> void:
 	var snapshot := statuses.duplicate()
 	for instance in snapshot:
-		var status := StatusManager.get_status(instance.status_id)
+		var status := Statuses.get_status(instance.status_id)
 		if status:
 			status.on_turn_start(self, instance)
 		if is_dead:
