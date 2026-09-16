@@ -31,7 +31,7 @@ var mysticism: float = 3.0
 
 var move_ability: UnitAbility
 var abilities: Array[UnitAbility] = []
-var statuses: Array = []           # Array of StatusBase.Instance
+var statuses: Dictionary[String, StatusInstance] = {}
 var ability_slots: Array[UnitAbility] = []
 
 # Triggers: { id, timing, callable, interruptible, cancel_if }
@@ -84,7 +84,7 @@ func _reset_ability_uses() -> void:
 func _tick_statuses() -> void:
 	var snapshot := statuses.duplicate()
 	for instance in snapshot:
-		var status := StatusBase.get_status(instance.status_id)
+		var status := StatusManager.get_status(instance.status_id)
 		if status:
 			status.on_turn_start(self, instance)
 		if is_dead:
@@ -158,30 +158,25 @@ func register_ability_triggers() -> void:
 
 # --- Status management ---
 
-func get_status(id: String) -> StatusBase.Instance:
-	for instance in statuses:
-		if instance.status_id == id:
-			return instance
-	return null
+func get_status(id: String) -> StatusInstance:
+	return statuses.get(id)
+
+func get_status_total(id: String) -> int:
+	var instance := get_status(id)
+	return instance.get_total_magnitude() if instance else 0
 
 func has_status(id: String) -> bool:
-	return get_status(id) != null
+	return statuses.has(id)
 
-func apply_status(id: String, stacks: int, data: Dictionary = {}) -> void:
-	print("Applying status ", id)
-	var existing := get_status(id)
-	if existing:
-		existing.stacks += stacks
-	else:
-		statuses.append(StatusBase.Instance.new(id, stacks, data))
+func apply_status(id: String, magnitude: int, duration: int = -1, source: UnitAbility = null) -> void:
+	StatusManager.apply_status(statuses, id, magnitude, duration, source)
 
 func remove_status(id: String) -> void:
-	var i := statuses.size() - 1
-	while i >= 0:
-		if statuses[i].status_id == id:
-			statuses.remove_at(i)
-			return
-		i -= 1
+	statuses.erase(id)
+	
+func remove_status_stacks(id: String, magnitude: int) -> void:
+	StatusManager.remove_status_stacks(statuses, id, magnitude)
+
 
 # --- Damage and death ---
 
