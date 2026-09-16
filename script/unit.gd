@@ -83,7 +83,7 @@ func _reset_ability_uses() -> void:
 func _tick_statuses() -> void:
 	var snapshot := statuses.duplicate()
 	for instance in snapshot:
-		var status := Statuses.get_status(instance.status_id)
+		var status := Status.get_status(instance.status_id)
 		if status:
 			status.on_turn_start(self, instance)
 		if is_dead:

@@ -13,7 +13,6 @@ var sequence_timer: float = 0
 var battle_sides: Dictionary = {}    # BattleSide.Side -> BattleSide
 var timeline: Timeline
 var input_consumer: UnitAbility = null
-var s = Statuses
 
 func register_unit(unit: Unit) -> void:
 	unit.battle = self
@@ -43,8 +42,8 @@ func _ready() -> void:
 	for side_enum in battle_sides:
 		timeline.register_side(battle_sides[side_enum])
 	start_combat()
-	print(Statuses._registry.size())
-	print(Statuses._registry)
+	print(Status._registry.size())
+	print(Status._registry)
 	print(Ability._registry.size())
 	print(Ability._registry)
 

@@ -7,8 +7,8 @@ var stacks: Array[StatusStack]
 func _init(p_id: String) -> void:
 	status_id = p_id
 
-func get_status() -> StatusBase:
-	return Statuses.get_status(status_id)
+func get_status() -> Status:
+	return Status.get_status(status_id)
 
 func get_total_magnitude() -> int:
 	var sum: int = 0

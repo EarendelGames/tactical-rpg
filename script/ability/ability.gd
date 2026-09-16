@@ -2,7 +2,6 @@
 class_name Ability
 extends RefCounted
 
-# --- Registry ---
 enum Tag {
 	BASIC, # Units usually have at least 1, and it usually has no cost other than max_uses
 	ULTIMATE, # Max 1 per unit, powerful but costly, maybe 1 use per battle?
@@ -38,6 +37,8 @@ enum Tag {
 	CRYSTAL, #LIGHT
 	UMBRA, #DARK
 }
+
+# --- Registry ---
 
 static var _registry: Dictionary = {}
 

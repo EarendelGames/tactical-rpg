@@ -1,12 +1,15 @@
 # status_manager.gd
 class_name StatusManager
 
-# status_base.gd — additions
+static var status_includes = [ # include various collections
+	Statuses
+]
+
 static func apply_status(statuses: Dictionary, id: String, magnitude: int, duration: int = -1, source: UnitAbility = null) -> void:
 	return apply_status_stack(statuses, id, StatusStack.new(magnitude, duration, source))
 	
 static func apply_status_stack(statuses: Dictionary, id: String, incoming: StatusStack) -> void:
-	var status := Statuses.get_status(id)
+	var status := Status.get_status(id)
 	var surviving: Array[StatusStack] = [incoming]
 
 	for opposing_id in status.opposes:
