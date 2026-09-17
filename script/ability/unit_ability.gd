@@ -47,10 +47,14 @@ func range_highlight(cells = null) -> void:
 	if not cells: 
 		cells =  get_reachable_cells()
 	#var input_phase:AbilityInput = ability.inputs[0] #only consider the first phase for now
-	for cell:HexCell in cells:
-		#if input_phase.selection_type == Selection.Type.CELL:
-		#if input_phase.selection_type == Selection.Type.UNIT:
-		cell.set_range_layer(Color(1.0, 0.9, 0.0, 0.5), HexCell.Edge.ALL)
+	#for cell:HexCell in cells:
+		##if input_phase.selection_type == Selection.Type.CELL:
+		##if input_phase.selection_type == Selection.Type.UNIT:
+		#cell.set_range_layer(Color(1.0, 0.9, 0.0, 0.5), HexCell.Edge.ALL)
+	var color = null
+	if ability.id == "basic_move":
+		color = Color(0.374, 0.64, 0.183, 0.494)
+	unit.battle.grid.set_range_layer(cells, color)
 
 func get_reachable_cells() -> Array[HexCell]:
 	var input_phase: AbilityInput = ability.inputs[0]
@@ -77,15 +81,16 @@ func get_reachable_cells() -> Array[HexCell]:
 func update_aoe_preview(virtual_input: AbilitySelectionResults) -> void:
 	for cell:HexCell in unit.battle.grid.cells_array:
 		cell.set_effect_layer(Color(0,0,0,0))
-	var aoe_layers = []
+	var aoe_layers: Array[Array] = []
 	for step:AbilityStep in ability.steps:
 		if step is StepAutoselect:
 			(step as StepAutoselect).build_actions(self, virtual_input, null)
 		if step is StepApplyEffects:
 			aoe_layers.append((step as StepApplyEffects).get_cells(self, virtual_input))
-	for layer in aoe_layers:
-		for cell:HexCell in layer:
-			cell.set_effect_layer(Color(1.0, 0.0, 0.0, 0.502), HexCell.Edge.ALL)
+	#for layer in aoe_layers:
+		#for cell:HexCell in layer:
+			#cell.set_effect_layer(Color(1.0, 0.0, 0.0, 0.502), HexCell.Edge.ALL)
+	unit.battle.grid.set_effect_layers(aoe_layers)
 	
 func get_path_to(cell: HexCell) -> Array[HexCell]:
 	var path: Array[HexCell] = [cell]

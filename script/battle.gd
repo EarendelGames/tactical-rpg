@@ -137,9 +137,11 @@ func advance_turn() -> void:
 	_advance_to_next_turn()
 
 func clear_highlights() -> void:
-	for cell:HexCell in grid.cells_array:
-		cell.set_range_layer(Color(0,0,0,0))
-		cell.set_effect_layer(Color(0,0,0,0))
+	grid.set_range_layer([])
+	grid.set_effect_layers([])
+	#for cell:HexCell in grid.cells_array:
+		#cell.set_range_layer(Color(0,0,0,0))
+		#cell.set_effect_layer(Color(0,0,0,0))
 
 func set_input_consumer(ua:UnitAbility) -> void:
 	input_consumer = ua

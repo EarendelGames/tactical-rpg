@@ -27,11 +27,14 @@ var _movement_triggers: Array = []
 # affected cells). Each layer has a fill color and a 6-bit outline mask, where
 # bit i means edge i is an outer edge of that layer's region on this cell.
 # Edge/corner index order matches GridHandler's NEIGHBOUR_OFFSETS direction order.
-var range_layer_color: Color = Color(0, 0, 0, 0)
+var range_layer_color: Color = blank_color
 var range_outline_mask: int = 0
-var effect_layer_color: Color = Color(0, 0, 0, 0)
+var effect_layer_color: Color = blank_color
 var effect_outline_mask: int = 0
 enum Edge { NONE = 0, E0 = 1, E1 = 2, E2 = 4, E3 = 8, E4 = 16, E5 = 32, ALL = 63}
+
+var overlay_color: Color = blank_color
+var outline_colors: Array[Color] = outline_colours_blank()
 
 # Cursor targeting indicator. Only one of these is meaningful at a time,
 # depending on the ability's selection mode (cell / edge / corner).
@@ -43,6 +46,7 @@ var last_hover: int = -1 # Updated on set_hovered_cell
 # Shared across every HexCell instance so they all draw with one material and
 # differ only via per-instance shader parameters.
 static var _shared_material: ShaderMaterial = null
+static var blank_color : Color = Color(0, 0, 0, 0)
 
 func _ready() -> void:
 
@@ -188,12 +192,37 @@ func _edge_outline_color(edge: int) -> Color:
 		return effect_layer_color
 	return Color(0, 0, 0, 0)
 
-func _push_shader_params() -> void:
-	if mesh == null:
-		return
-	mesh.set_instance_shader_parameter("overlay_color", _blend(range_layer_color, effect_layer_color))
+static func outline_colours_blank() -> Array[Color]:
+	var colors: Array[Color] = []
 	for i in 6:
-		mesh.set_instance_shader_parameter("outline_color_%d" % i, _edge_outline_color(i))
+		colors.append(blank_color)
+	return colors
+
+func set_overlay(p_overlay_color: Color, p_outline_colors: Array[Color]) -> void:
+	var different = false
+	if p_overlay_color != overlay_color:
+		different = true
+	else:
+		for i in 6:
+			if p_outline_colors[i] != outline_colors[i]:
+				different = true
+				break
+	if different:
+		overlay_color = p_overlay_color
+		outline_colors = p_outline_colors
+	_push_shader_params()
+	
+func _push_shader_params() -> void:
+	#mesh.set_instance_shader_parameter("overlay_color", _blend(range_layer_color, effect_layer_color))
+	#for i in 6:
+		#mesh.set_instance_shader_parameter("outline_color_%d" % i, _edge_outline_color(i))
+	mesh.set_instance_shader_parameter("overlay_color", overlay_color)
+	var p_outline_colors = outline_colors
+	if p_outline_colors.is_empty():
+		p_outline_colors = outline_colours_blank()
+	for i in p_outline_colors.size():
+		mesh.set_instance_shader_parameter("outline_color_%d" % i, p_outline_colors[i])
+		
 	mesh.set_instance_shader_parameter("cursor_cell_highlight", cursor_cell_highlight)
 	mesh.set_instance_shader_parameter("cursor_edge_highlight", cursor_edge_highlight)
 	mesh.set_instance_shader_parameter("cursor_corner_highlight", cursor_corner_highlight)

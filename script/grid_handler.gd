@@ -34,7 +34,7 @@ const NEIGHBOUR_OFFSETS_ODD: Array[Vector2i] = [
 # Keyed by "ix,iy,iz", value is array of HexCells at that int position, iy is height
 var _cells: Dictionary = {}
 # Flat lookup from Vector3i int_pos to HexCell, built at runtime
-var _pos_to_cell: Dictionary = {}
+var _pos_to_cell: Dictionary[Vector3i, HexCell] = {}
 var cells_2d: Dictionary[Vector2i, Array] = {}
 var cells_array: Array[HexCell]
 var battle: Battle
@@ -45,6 +45,22 @@ var _hovered_cell: HexCell
 var _hovered_segment: int
 
 var _hover_counter: int = 0
+
+var range_layer: Array # Array[HexCell]
+var range_color = null # Color or null
+var range_color_default = Color(0.639, 0.524, 0.004, 0.5)
+
+var effect_layers: Array[Array] #Array[Array[HexCell]]
+var effect_layer_colours: Array[Color] = [] # Overrides for layer defaults
+var effect_layer_colour_defaults: Array[Color] = [
+	Color(1.0, 0.0, 0.0, 0.5),
+	Color(0.0, 0.529, 0.989, 0.5),
+	Color(0.535, 0.408, 1.0, 0.5),
+	Color(0.126, 0.645, 0.0, 0.5),
+	Color(0.945, 0.0, 0.59, 0.5),
+	Color(0.0, 0.61, 0.636, 0.5),
+	Color(0.791, 0.427, 0.0, 0.5),
+]
 
 # --- Registration ---
 
@@ -448,3 +464,44 @@ static func get_cell_distance_vs(from:Vector3i, to:Vector3i) -> int: #vs = verti
 		Vector2i(from.x, from.z),
 		Vector2i(to.x, to.z)
 	), abs(from.y - to.y))
+
+func set_range_layer(p_range_layer : Array, p_range_color = null) -> void:
+	range_layer = p_range_layer
+	range_color = p_range_color
+	bake_layers_to_cells()
+
+func set_effect_layers(p_effect_layers : Array[Array], layer_colours: Array[Color] = []) -> void:
+	effect_layers = p_effect_layers
+	effect_layer_colours = layer_colours
+	bake_layers_to_cells()
+
+func bake_layers_to_cells() -> void:
+	var cell_colours : Dictionary = {}
+	for cell in cells_array:
+		cell_colours[cell.int_pos] = []
+		
+	for cell in range_layer:
+		cell_colours[cell.int_pos].append(get_range_colour())
+	for i in effect_layers.size():
+		var layer = effect_layers[i]
+		for cell in layer:
+			cell_colours[cell.int_pos].append(get_effect_layer_colour(i))
+	for cell_pos:Vector3i in cell_colours:
+		var colours = cell_colours[cell_pos]
+		var colour = HexCell.blank_color
+		if colours.size() > 0:
+			for layer in colours:
+				colour += layer
+			colour /= colours.size()
+		var cell = _pos_to_cell[cell_pos]
+		cell.set_overlay(colour, [colour,colour,colour,colour,colour,colour])
+	
+func get_range_colour() -> Color:
+	if range_color:
+		return range_color
+	return range_color_default
+	
+func get_effect_layer_colour(i: int) -> Color:
+	if i < effect_layer_colours.size():
+		return effect_layer_colours[i]
+	return effect_layer_colour_defaults[i % effect_layer_colour_defaults.size()]
