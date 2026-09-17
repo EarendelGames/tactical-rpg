@@ -7,18 +7,25 @@ var phase_index: int = 0
 var transformer: TargetTransformer   # null = identity
 var effects: Array[AbilityEffect]
 
-func build_actions(unit_ability: UnitAbility, results: AbilitySelectionResults, tree: SequenceTree) -> void:
+func get_cells(unit_ability: UnitAbility, results: AbilitySelectionResults) -> Array[HexCell]:
+	var cells: Array[HexCell] = []
 	var phase_selections: Array[AbilitySelectionResult] = results.get_phase(phase_index)
 	for selection: AbilitySelectionResult in phase_selections:
-		var cells: Array[HexCell] = [selection.cell]
 		if transformer:
-			cells = transformer.get_cells(unit_ability, selection)
-		for cell in cells:
-			var actions: Array[ActionNode] = []
-			for effect in effects:
-				actions.append(ActionEffect.new(unit_ability, effect, cell))
-			tree.append_sequential_action(actions[0] if actions.size() == 1 else ActionSequence.new(unit_ability, actions))
-			
+			for cell in transformer.get_cells(unit_ability, selection):
+				cells.append(cell)
+		else:
+			cells.append(selection.cell)
+	return cells
+	
+
+func build_actions(unit_ability: UnitAbility, results: AbilitySelectionResults, tree: SequenceTree) -> void:
+	var cells = get_cells(unit_ability, results)
+	for cell in cells:
+		var actions: Array[ActionNode] = []
+		for effect in effects:
+			actions.append(ActionEffect.new(unit_ability, effect, cell))
+		tree.append_sequential_action(actions[0] if actions.size() == 1 else ActionSequence.new(unit_ability, actions))
 
 func with_transformer(p_transformer: TargetTransformer) -> StepApplyEffects:
 	transformer = p_transformer

@@ -73,6 +73,19 @@ func get_reachable_cells() -> Array[HexCell]:
 		if GridHandler.get_cell_distance(unit.current_cell.int_pos, cell.int_pos) >= min_range:
 			reachable_cells.append(cell)
 	return reachable_cells
+
+func update_aoe_preview(virtual_input: AbilitySelectionResults) -> void:
+	for cell:HexCell in unit.battle.grid.cells_array:
+		cell.set_effect_layer(Color(0,0,0,0))
+	var aoe_layers = []
+	for step:AbilityStep in ability.steps:
+		if step is StepAutoselect:
+			(step as StepAutoselect).build_actions(self, virtual_input, null)
+		if step is StepApplyEffects:
+			aoe_layers.append((step as StepApplyEffects).get_cells(self, virtual_input))
+	for layer in aoe_layers:
+		for cell:HexCell in layer:
+			cell.set_effect_layer(Color(1.0, 0.0, 0.0, 0.502), HexCell.Edge.ALL)
 	
 func get_path_to(cell: HexCell) -> Array[HexCell]:
 	var path: Array[HexCell] = [cell]

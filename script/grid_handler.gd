@@ -193,6 +193,10 @@ func _on_hovered_state_changed() -> void:
 				cell.set_cursor_cell(true)
 		else:
 			_hovered_cell.set_cursor_cell(true)
+		if battle.input_consumer:
+			var virtual_input = AbilitySelectionResults.new()
+			virtual_input.add_phase([AbilitySelectionResult.new().with_cell(_hovered_cell)])
+			battle.input_consumer.update_aoe_preview(virtual_input)
 
 func get_edge_index_from_segment(segment: int) -> int:
 	return floori(segment / 2.0)
