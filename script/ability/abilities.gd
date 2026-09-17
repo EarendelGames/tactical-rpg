@@ -18,7 +18,7 @@ static var blink_strike := Ability.new("blink_strike", "Blink Strike",
 static var basic_move := Ability.new("basic_move", "Move", "Move to a new tile", [Ability.Tag.MOVEMENT]) \
 	.uses_per_turn(false) \
 	.with_input(AbilityInput.cell(Evaluator.new(Evaluator.Target.movement_points), 1, 1, 1, true, false)) \
-	.with_step(StepApplyEffects.new().with_transformer(AOETransformer.new(AOEShape.path())).with_effects([EffectMove.new()]))
+	.with_step(StepApplyEffects.new().with_transformer(AOETransformer.new(AOEShape.path(0, 1))).with_effects([EffectMove.new()]))
 
 static var basic_attack := Ability.new(
 	"basic_attack", "Attack",

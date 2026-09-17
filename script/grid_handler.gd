@@ -475,7 +475,7 @@ func set_effect_layers(p_effect_layers : Array[Array], layer_colours: Array[Colo
 	effect_layer_colours = layer_colours
 	bake_layers_to_cells()
 
-func bake_layers_to_cells() -> void:
+func bake_layers_to_cells_basic() -> void:
 	var cell_colours : Dictionary = {}
 	for cell in cells_array:
 		cell_colours[cell.int_pos] = []
@@ -495,7 +495,81 @@ func bake_layers_to_cells() -> void:
 			colour /= colours.size()
 		var cell = _pos_to_cell[cell_pos]
 		cell.set_overlay(colour, [colour,colour,colour,colour,colour,colour])
-	
+
+func bake_layers_to_cells() -> void:
+	var regions: Array[Dictionary] = []
+	var region_colours: Array[Color] = []
+
+	# Range layer.
+	var range_cells: Dictionary = {}
+	var range_positions: Dictionary = {}
+
+	for cell: HexCell in range_layer:
+		range_cells[cell] = true
+		range_positions[pos_2d(cell.int_pos)] = true
+
+	regions.append({
+		"cells": range_cells,
+		"positions": range_positions,
+	})
+	region_colours.append(get_range_colour())
+
+	# Effect layers.
+	for i in effect_layers.size():
+		var layer_cells: Dictionary = {}
+		var layer_positions: Dictionary = {}
+
+		for cell: HexCell in effect_layers[i]:
+			layer_cells[cell] = true
+			layer_positions[pos_2d(cell.int_pos)] = true
+
+		regions.append({
+			"cells": layer_cells,
+			"positions": layer_positions,
+		})
+		region_colours.append(get_effect_layer_colour(i))
+
+	for cell: HexCell in cells_array:
+		var pos2d := pos_2d(cell.int_pos)
+		var offsets := NEIGHBOUR_OFFSETS_ODD if (cell.int_pos.z & 1) else NEIGHBOUR_OFFSETS_EVEN
+
+		var colours: Array[Color] = []
+		var edge_colours: Array[Color] = []
+
+		for i in regions.size():
+			var region: Dictionary = regions[i]
+			var layer_cells: Dictionary = region["cells"]
+			var layer_positions: Dictionary = region["positions"]
+
+			# This cell must actually belong to the region.
+			if not layer_cells.has(cell):
+				continue
+
+			var region_colour: Color = region_colours[i]
+			colours.append(region_colour)
+
+			for edge in 6:
+				var neighbour_pos := pos2d + offsets[edge]
+
+				if not layer_positions.has(neighbour_pos):
+					if edge_colours.size() <= edge:
+						while edge_colours.size() <= edge:
+							edge_colours.append(HexCell.blank_color)
+
+					edge_colours[edge] += region_colour
+
+		# Ensure six edge colours exist.
+		while edge_colours.size() < 6:
+			edge_colours.append(HexCell.blank_color)
+
+		var colour := HexCell.blank_color
+		if not colours.is_empty():
+			for region_colour in colours:
+				colour += region_colour
+			colour /= colours.size()
+
+		cell.set_overlay(colour, edge_colours)
+
 func get_range_colour() -> Color:
 	if range_color:
 		return range_color

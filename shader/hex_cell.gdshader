@@ -2,7 +2,7 @@ shader_type spatial;
 render_mode blend_mix, unshaded, depth_draw_opaque, cull_back;
 
 // --- Global styling (shared across every hex; tune here) ---
-uniform float outline_thickness : hint_range(0.0, 0.3) = 0.05;
+uniform float outline_thickness : hint_range(0.0, 0.3) = 0.15;
 uniform float outline_pulse_speed : hint_range(0.0, 10.0) = 2.0;
 uniform float outline_pulse_amount : hint_range(0.0, 1.0) = 0.35;
 uniform float cursor_line_thickness : hint_range(0.0, 0.3) = 0.035;
