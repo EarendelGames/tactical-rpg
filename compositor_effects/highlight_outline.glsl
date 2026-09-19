@@ -59,7 +59,8 @@ void main() {
 	float is_highlighted_front = clamp(1.0 + (highlight_depth - base_depth) * 100000.0, 0.0, 1.0); // works
 	float is_highlighted_hidden = is_highlighted * (1.0 - is_highlighted_front);
 
-	float depth_border = 0.0;
+	float dark_depth_border = 0.0;
+	float highlight_depth_border = 0.0;
 	float sample_size = params.outline_size;
 	for (float x = -sample_size; x <= sample_size; x++) {
 		for (float y = -sample_size; y <= sample_size; y++) {
@@ -67,25 +68,34 @@ void main() {
 			if (sample_length > sample_size)
 				continue;
 			vec2 offset_uv = uv_normalized + vec2(x, y) / size + offset;
+
 			float offset_highlight_depth = texture(highlight_depth_texture, offset_uv).a;
 			offset_highlight_depth = to_linear_depth(offset_highlight_depth, offset_uv);
-			float depth_difference = params.depth_difference_multiplier * (offset_highlight_depth - highlight_depth);
-
 			if (highlight_depth < offset_highlight_depth){
-				depth_border = max(depth_border, clamp(-10.0 * (sample_length * 0.1 - depth_difference), 0.0, 1.0));
+				float depth_difference = params.depth_difference_multiplier * (offset_highlight_depth - highlight_depth);
+				highlight_depth_border = max(highlight_depth_border, clamp(-10.0 * (sample_length * 0.1 - depth_difference), 0.0, 1.0));
 			}
-			if (depth_border == 1.0)
+
+			float offset_dark_depth = texture(base_depth_texture, offset_uv).a;
+			offset_dark_depth = to_linear_depth(offset_dark_depth, offset_uv);
+			if (base_depth < offset_dark_depth){
+				float depth_difference = params.depth_difference_multiplier * (offset_dark_depth - base_depth);
+				dark_depth_border = max(dark_depth_border, clamp(-10.0 * (sample_length * 0.1 - depth_difference), 0.0, 1.0));
+			}
+
+			if (dark_depth_border == 1.0 || highlight_depth_border == 1.0)
 				break;
 		}
-		if (depth_border == 1.0)
+		if (highlight_depth_border == 1.0)
 			break;
 	}
 
 	vec3 highlighted_region = mix(highlight_depth_color.rgb, params.highlight_color.rgb, 0.5);
 	vec3 pre_outline = mix(color.rgb, params.highlight_color.rgb, is_highlighted_front * params.highlight_color.a * checker);
-	vec3 post_outline = mix(pre_outline, params.outline_color.rgb, depth_border * params.outline_color.a);
+	vec3 post_outline1 = mix(pre_outline, vec3(0.0), dark_depth_border);
+	vec3 post_outline2 = mix(post_outline1, params.outline_color.rgb, highlight_depth_border * params.outline_color.a);
 
-	imageStore(color_image, uv, vec4(post_outline, 1.0));
+	imageStore(color_image, uv, vec4(post_outline2, 1.0));
 	//imageStore(color_image, uv, vec4(vec3(highlight_depth), 1.0));
 	//imageStore(color_image, uv, vec4(vec3(highlight_depth_color.a), 1.0));
 	//imageStore(color_image, uv, vec4(vec3(base_depth_color.a), 1.0));
