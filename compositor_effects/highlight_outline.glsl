@@ -16,6 +16,8 @@ layout(rgba16f, set = 0, binding = 1) uniform image2D color_image;
 layout(set = 0, binding = 2) uniform sampler2D depth_texture;
 layout(set = 0, binding = 3) uniform sampler2D base_depth_texture;
 layout(set = 0, binding = 4) uniform sampler2D highlight_depth_texture;
+//layout(set = 0, binding = 5) uniform sampler2D normal_texture;
+layout(set = 0, binding = 5) uniform sampler2D normal_texture;
 
 const vec2 offset = vec2(0.0001);
 const float nan = -(1.0/0.0);
@@ -28,6 +30,16 @@ float to_linear_depth(float raw_depth, vec2 uv) {
 	vec4 view = params.inv_proj_mat * vec4(ndc, 1.0);
 	view.xyz /= view.w;
 	return view.z;
+}
+
+// Godot's built-in conversion logic to extract true screen-space normal data
+vec4 normal_roughness_compatibility(vec4 p_normal_roughness) {
+    float roughness = p_normal_roughness.w;
+    if (roughness > 0.5) {
+        roughness = 1.0 - roughness;
+    }
+    roughness /= (127.0 / 255.0);
+    return vec4(normalize(p_normal_roughness.xyz * 2.0 - 1.0) * 0.5 + 0.5, roughness);
 }
 
 void main() {
@@ -45,6 +57,8 @@ void main() {
 	float checker = float((cx + cy) % 2);
 
 	vec4 color = imageLoad(color_image, uv);
+	vec4 normal_raw = texture(normal_texture, uv_normalized + offset);
+	vec3 normal_fixed = normal_roughness_compatibility(normal_raw).rgb;
 	//float raw_depth = texture(depth_texture, uv_normalized + offset).r; // for some reason is on a different scale
 
 	vec4 highlight_depth_color = texture(highlight_depth_texture, uv_normalized + offset);
@@ -76,11 +90,23 @@ void main() {
 				highlight_depth_border = max(highlight_depth_border, clamp(-10.0 * (sample_length * 0.1 - depth_difference), 0.0, 1.0));
 			}
 
+			//float offset_dark_depth = texture(base_depth_texture, offset_uv).a;
+			//offset_dark_depth = to_linear_depth(offset_dark_depth, offset_uv);
+			//if (base_depth < offset_dark_depth){
+			//	float depth_difference = params.depth_difference_multiplier * (offset_dark_depth - base_depth);
+			//	dark_depth_border = max(dark_depth_border, clamp(10.0 * depth_difference - sample_length, 0.0, 1.0));
+			//}
+
 			float offset_dark_depth = texture(base_depth_texture, offset_uv).a;
 			offset_dark_depth = to_linear_depth(offset_dark_depth, offset_uv);
 			if (base_depth < offset_dark_depth){
 				float depth_difference = params.depth_difference_multiplier * (offset_dark_depth - base_depth);
-				dark_depth_border = max(dark_depth_border, clamp(-10.0 * (sample_length * 0.1 - depth_difference), 0.0, 1.0));
+				vec3 normal_offset = normal_roughness_compatibility(texture(normal_texture, offset_uv)).rgb;
+				float normal_difference = length(normal_offset - normal_fixed) * 0.5;
+				dark_depth_border = max(dark_depth_border, clamp(10.0 * depth_difference + 5.0 * pow(normal_difference, 0.5) - sample_length, 0.0, 1.0));
+				if (highlight_depth < offset_highlight_depth){
+					highlight_depth_border = max(highlight_depth_border, clamp(10.0 * depth_difference + 5.0 * pow(normal_difference, 0.5) - sample_length, 0.0, 1.0));
+				}
 			}
 
 			if (dark_depth_border == 1.0 || highlight_depth_border == 1.0)
@@ -100,4 +126,6 @@ void main() {
 	//imageStore(color_image, uv, vec4(vec3(highlight_depth_color.a), 1.0));
 	//imageStore(color_image, uv, vec4(vec3(base_depth_color.a), 1.0));
 	//imageStore(color_image, uv, vec4(vec3(highlight_depth_color.rgb), 1.0));
+	//imageStore(color_image, uv, normal_fixed);
+	//imageStore(color_image, uv, vec4(vec3(normal_fixed.r), 1.0));
 }

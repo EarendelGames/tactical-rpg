@@ -10,6 +10,7 @@ var depth_sampler := RID()
 
 var base_texture_sampler := RID()
 var highlighted_texture_sampler := RID()
+var normal_sampler := RID()
 
 #$WorldEnvironment.compositor.compositor_effects[1].base_texture_rd = RenderingServer.texture_get_rd_texture($SubViewportBase.get_texture())
 var base_texture_rd = null
@@ -42,6 +43,11 @@ func _init() -> void:
 	var highlighted_sampler_state := RDSamplerState.new()
 	highlighted_texture_sampler = rd.sampler_create(highlighted_sampler_state)
 	
+	var normal_sampler_state := RDSamplerState.new()
+	normal_sampler = rd.sampler_create(normal_sampler_state)
+	
+	needs_normal_roughness = true
+	#effect_callback_type = CompositorEffect.EFFECT_CALLBACK_TYPE_POST_OPAQUE
 
 func _render_callback(_callback_type: int, render_data: RenderData) -> void:
 	if base_texture_rd == null or highlighted_texture_rd == null: return
@@ -81,12 +87,15 @@ func _render_callback(_callback_type: int, render_data: RenderData) -> void:
 	var base_texture_uniform := _texture_sampler_uniform(base_texture_rd, base_texture_sampler, 3)
 	var highlighted_texture_uniform := _texture_sampler_uniform(highlighted_texture_rd, highlighted_texture_sampler, 4)
 	
+	var normal_texture_uniform := _texture_sampler_uniform(render_scene_buffers.get_texture("forward_clustered", "normal_roughness"), normal_sampler, 5)
+	
 	var bindings: Array[RDUniform] = [
 		parameter_uniform,
 		color_layer_uniform,
 		depth_layer_uniform,
 		base_texture_uniform,
-		highlighted_texture_uniform
+		highlighted_texture_uniform,
+		normal_texture_uniform
 	]
 	
 	var uniform_set := rd.uniform_set_create(bindings, shader, 0)

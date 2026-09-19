@@ -37,6 +37,16 @@ transform = Transform3D(0.0062457547, -0.22428498, 0.9745036, 0.18490607, 0.9579
 mesh = SubResource("PlaneMesh_jb4b8")
 skeleton = NodePath("../..")
 
+[node name="MeshInstance3D8" type="MeshInstance3D" parent="Objects" unique_id=2100437014]
+transform = Transform3D(0.024726849, -0.22300531, 0.9745036, 0.105247505, 0.9699652, 0.21929617, -0.9941386, 0.09714147, 0.047454953, 2.881729, 0.11833671, 4.8769307)
+mesh = SubResource("PlaneMesh_jb4b8")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D9" type="MeshInstance3D" parent="Objects" unique_id=832122175]
+transform = Transform3D(-0.020280356, -0.22345366, 0.9745036, 0.2967255, 0.9294429, 0.21929619, -0.9547475, 0.2936074, 0.047454983, 3.4737284, 0.14896941, 5.4553356)
+mesh = SubResource("PlaneMesh_jb4b8")
+skeleton = NodePath("../..")
+
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Objects" unique_id=2082093961]
 transform = Transform3D(0.99999994, -1.4901161e-08, 0, -1.4901161e-08, 1, -3.7252903e-09, 0, 1.1175871e-08, 1, 0, 0, 0)
 layers = 1025
@@ -66,6 +76,16 @@ skeleton = NodePath("../..")
 
 [node name="MeshInstance3D3" type="MeshInstance3D" parent="Objects" unique_id=40906079]
 transform = Transform3D(0.26903915, 0.008641332, -0.96309054, -0.3393872, 0.93667006, -0.08640352, 0.90135133, 0.35010642, 0.25493369, 0.5013697, -0.33926243, 2.4463167)
+mesh = SubResource("CapsuleMesh_jb4b8")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D10" type="MeshInstance3D" parent="Objects" unique_id=1344652925]
+transform = Transform3D(1.7285764, 0.055520177, -6.1878567, -2.180563, 6.0181055, -0.55514234, 5.791183, 2.2494342, 1.6379485, 7.286522, -4.5580125, 1.6956638)
+mesh = SubResource("CapsuleMesh_jb4b8")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D11" type="MeshInstance3D" parent="Objects" unique_id=253067585]
+transform = Transform3D(0.04304625, 0.0013825782, -0.15409447, -0.054301973, 0.1498672, -0.013824575, 0.14421621, 0.05601706, 0.04078936, 3.303519, 0.2971435, 5.221823)
 mesh = SubResource("CapsuleMesh_jb4b8")
 skeleton = NodePath("../..")
 
