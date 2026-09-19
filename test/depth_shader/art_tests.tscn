@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://bkfhyimts821x"]
+
+[ext_resource type="Script" uid="uid://ecwh8j651v5m" path="res://script/camera_simple.gd" id="1_f6sct"]
+[ext_resource type="Script" uid="uid://ddseljb64e3vt" path="res://compositor_effects/highlight_outline_environment.gd" id="2_f6sct"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gvdj5"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jb4b8"]
+material = SubResource("ShaderMaterial_gvdj5")
+size = Vector2(5.37, 3.995)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_cobpi"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_jb4b8"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u61p0"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_q4k0y"]
+material = SubResource("ShaderMaterial_u61p0")
+
+[sub_resource type="Environment" id="Environment_f6sct"]
+
+[node name="ArtTests" type="Node3D" unique_id=1098943654]
+
+[node name="MainCamera" type="Camera3D" parent="." unique_id=1733807163]
+transform = Transform3D(-1, 0, 8.742278e-08, 6.985106e-08, 0.601327, 0.799003, -5.2569675e-08, 0.799003, -0.601327, 0, 4.4258413, -2.5929396)
+script = ExtResource("1_f6sct")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=491425755]
+transform = Transform3D(-2.1321028e-08, 0.87297314, -0.48776826, 3.8158866e-08, 0.48776826, 0.87297314, 1, 0, -4.3711385e-08, -2.0137758, 2.2157712, 0.032955647)
+
+[node name="Objects" type="Node3D" parent="." unique_id=678218958]
+transform = Transform3D(0.006245762, 0.18490607, -0.9827364, -0.22428498, 0.95797646, 0.17882195, 0.9745036, 0.2192961, 0.04745494, 1.7871277, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Objects" unique_id=1784836238]
+transform = Transform3D(0.0062457547, -0.22428498, 0.9745036, 0.18490607, 0.9579766, 0.21929613, -0.9827363, 0.17882195, 0.047454946, -0.0025259582, -0.36733726, 1.7493899)
+mesh = SubResource("PlaneMesh_jb4b8")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Objects" unique_id=2082093961]
+transform = Transform3D(0.99999994, -1.4901161e-08, 0, -1.4901161e-08, 1, -3.7252903e-09, 0, 1.1175871e-08, 1, 0, 0, 0)
+layers = 1025
+mesh = SubResource("CapsuleMesh_cobpi")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D6" type="MeshInstance3D" parent="Objects" unique_id=1317770115]
+transform = Transform3D(0.8769775, 0.47783554, -0.050830018, -0.4406219, 0.75742346, -0.48183253, -0.19173682, 0.44495296, 0.8747878, 0.42156956, 0.0053547323, 0.50006175)
+mesh = SubResource("CapsuleMesh_cobpi")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="Objects" unique_id=1075554569]
+transform = Transform3D(0.99999994, -1.4901161e-08, 0, -1.4901161e-08, 1, -3.7252903e-09, 0, 1.1175871e-08, 1, -0.011161962, -0.33045074, 1.7562753)
+mesh = SubResource("CapsuleMesh_jb4b8")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D7" type="MeshInstance3D" parent="Objects" unique_id=1820434248]
+transform = Transform3D(0.9999999, -1.4901161e-08, 0, -1.4901161e-08, 1, -3.7252903e-09, 0, 2.6077032e-08, 1, -0.6403198, -0.31082606, 0.7429968)
+layers = 1025
+mesh = SubResource("CapsuleMesh_q4k0y")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="Objects" unique_id=522005256]
+transform = Transform3D(0.9950928, 0.00039497018, 0.09894478, 0.041266695, 0.90721285, -0.41864312, -0.08992932, 0.42067176, 0.90274465, -0.20610105, -0.9841788, 2.2587156)
+mesh = SubResource("CapsuleMesh_jb4b8")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="Objects" unique_id=40906079]
+transform = Transform3D(0.26903915, 0.008641332, -0.96309054, -0.3393872, 0.93667006, -0.08640352, 0.90135133, 0.35010642, 0.25493369, 0.5013697, -0.33926243, 2.4463167)
+mesh = SubResource("CapsuleMesh_jb4b8")
+skeleton = NodePath("../..")
+
+[node name="HighlightOutlineEnvironment" type="WorldEnvironment" parent="." unique_id=1461777454]
+environment = SubResource("Environment_f6sct")
+script = ExtResource("2_f6sct")
+highlight_color = Color(3.4461616e-05, 0.49719512, 0.9079379, 0.8745098)
+metadata/_custom_type_script = "uid://ddseljb64e3vt"

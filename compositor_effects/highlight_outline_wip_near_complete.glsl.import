@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://bm3n84cj2mphr"
+path="res://.godot/imported/highlight_outline_wip_near_complete.glsl-5b38eda6ec3a5f296272a53bc912dd93.res"
+
+[deps]
+
+source_file="res://compositor_effects/highlight_outline_wip_near_complete.glsl"
+dest_files=["res://.godot/imported/highlight_outline_wip_near_complete.glsl-5b38eda6ec3a5f296272a53bc912dd93.res"]
+
+[params]
+

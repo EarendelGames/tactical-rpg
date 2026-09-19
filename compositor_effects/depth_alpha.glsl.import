@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://c0civnypn1vp6"
+path="res://.godot/imported/depth_alpha.glsl-c2677b31ff44509b30e145183a231f17.res"
+
+[deps]
+
+source_file="res://compositor_effects/depth_alpha.glsl"
+dest_files=["res://.godot/imported/depth_alpha.glsl-c2677b31ff44509b30e145183a231f17.res"]
+
+[params]
+

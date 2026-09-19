@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://diborkk6od4f1"
+path="res://.godot/imported/merge_outline__wip_many_functions.glsl-d1d76808a44fa4af136568b94a3aba09.res"
+
+[deps]
+
+source_file="res://compositor_effects/merge_outline__wip_many_functions.glsl"
+dest_files=["res://.godot/imported/merge_outline__wip_many_functions.glsl-d1d76808a44fa4af136568b94a3aba09.res"]
+
+[params]
+

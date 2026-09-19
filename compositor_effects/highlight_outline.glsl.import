@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://e72narln08vi"
+path="res://.godot/imported/highlight_outline.glsl-200b0c79a487b5994cac4ad95ab55267.res"
+
+[deps]
+
+source_file="res://compositor_effects/highlight_outline.glsl"
+dest_files=["res://.godot/imported/highlight_outline.glsl-200b0c79a487b5994cac4ad95ab55267.res"]
+
+[params]
+
