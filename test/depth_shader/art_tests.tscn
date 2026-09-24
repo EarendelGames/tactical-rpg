@@ -9,6 +9,24 @@
 material = SubResource("ShaderMaterial_gvdj5")
 size = Vector2(5.37, 3.995)
 
+[sub_resource type="Gradient" id="Gradient_f6sct"]
+offsets = PackedFloat32Array(0.3292011, 0.5027548)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_gxpsk"]
+gradient = SubResource("Gradient_f6sct")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nrt3s"]
+transparency = 2
+alpha_scissor_threshold = 0.275
+alpha_antialiasing_mode = 0
+albedo_texture = SubResource("GradientTexture1D_gxpsk")
+texture_repeat = false
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_cyt5r"]
+material = SubResource("StandardMaterial3D_nrt3s")
+size = Vector2(5.37, 3.995)
+
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_cobpi"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_jb4b8"]
@@ -43,8 +61,8 @@ mesh = SubResource("PlaneMesh_jb4b8")
 skeleton = NodePath("../..")
 
 [node name="MeshInstance3D9" type="MeshInstance3D" parent="Objects" unique_id=832122175]
-transform = Transform3D(-0.020280356, -0.22345366, 0.9745036, 0.2967255, 0.9294429, 0.21929619, -0.9547475, 0.2936074, 0.047454983, 3.4737284, 0.14896941, 5.4553356)
-mesh = SubResource("PlaneMesh_jb4b8")
+transform = Transform3D(-0.13998704, -0.20595297, -0.9684971, -0.29232872, 0.9431251, -0.15830378, 0.94601655, 0.26095957, -0.19223106, 3.4631171, 0.35918334, 5.4948206)
+mesh = SubResource("PlaneMesh_cyt5r")
 skeleton = NodePath("../..")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Objects" unique_id=2082093961]

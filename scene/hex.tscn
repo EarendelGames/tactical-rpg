@@ -2,19 +2,18 @@
 
 [ext_resource type="Script" uid="uid://bonmls1y4r5gs" path="res://script/hex_cell.gd" id="1_khich"]
 [ext_resource type="Shader" uid="uid://cts0le4ut6enh" path="res://shader/hex_cell.gdshader" id="2_ao1v8"]
-[ext_resource type="Script" uid="uid://cbo3qipknide" path="res://script/hex_shape_3d.gd" id="2_slqgy"]
 [ext_resource type="Script" uid="uid://dnvr04fclhup8" path="res://script/hex_mesh.gd" id="3_0hfuy"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ao1v8"]
 render_priority = 0
 shader = ExtResource("2_ao1v8")
-shader_parameter/outline_thickness = 0.05
+shader_parameter/outline_thickness = 0.15
 shader_parameter/outline_pulse_speed = 2.0
 shader_parameter/outline_pulse_amount = 0.35
 shader_parameter/cursor_line_thickness = 0.035
 shader_parameter/cursor_wedge_alpha = 0.35
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_2guvj"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_0hfuy"]
 _surfaces = [{
 "aabb": AABB(-0.5, 0, -0.57735026, 1, 1e-05, 1.1547005),
 "attribute_data": PackedByteArray("AAAAPwAAAD/s2W4/AABAPwAAAD8AAIA/ozCJPQAAQD+jMIk9AACAPgAAAD8AAAAA7NluPwAAgD4="),
@@ -27,8 +26,63 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAAAAAAAAAAAAAAAAAAAPwAAAAA6zZM+fwcjJAAAAAA6zRM/AAAAvwAAAAA6zZM+AAAAvwAAAAA6zZO+P4v0pAAAAAA6zRO/AAAAPwAAAAA6zZO+")
 }]
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_jaa0m"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ao1v8"]
 points = PackedVector3Array(0.5, 0, 0.28867513, 3.535134e-17, 0, 0.57735026, -0.5, 0, 0.28867513, -0.5, 0, -0.28867513, -1.06054024e-16, 0, -0.57735026, 0.5, 0, -0.28867513, 0.5, -0.5, 0.28867513, 3.535134e-17, -0.5, 0.57735026, -0.5, -0.5, 0.28867513, -0.5, -0.5, -0.28867513, -1.06054024e-16, -0.5, -0.57735026, 0.5, -0.5, -0.28867513)
+
+[sub_resource type="GDScript" id="GDScript_2guvj"]
+script/source = "@tool
+class_name HexShape3D
+extends CollisionShape3D
+
+# Globally shared cache across all HexBody instances
+static var shape_cache: Dictionary[StringName, ConvexPolygonShape3D] = {}
+
+@export var diameter: int = 1:
+	set(value):
+		diameter = max(1, value) # Prevent 0 or negative diameter
+		_update_shape()
+
+@export var depth: int = 1:
+	set(value):
+		depth = max(1, value) # Prevent 0 or negative depth
+		_update_shape()
+
+func _ready() -> void:
+	_update_shape()
+
+func _update_shape() -> void:
+	if not is_inside_tree():
+		return
+
+	# Unique key utilizing only the two integers
+	var cache_key := StringName(\"%d_%d\" % [diameter, depth])
+	
+	# Handle collision shape caching
+	if false and shape_cache.has(cache_key):
+		self.shape = shape_cache[cache_key]
+	else:
+		var new_shape := _generate_convex_shape(diameter, depth)
+		shape_cache[cache_key] = new_shape
+		self.shape = new_shape
+
+# Helper function to compute raw outer vertices for the convex shape
+func _generate_convex_shape(diameter: int, d: int) -> ConvexPolygonShape3D:
+	var corner_radius: float = diameter * 0.5 / cos(PI / 6.0)
+	var vertices := PackedVector3Array()
+	
+	# Top layer sits at y = 0, bottom layer extends down to y = -depth
+	for side in range(2):
+		var y: float = 0.0 if side == 0 else -float(d) * 0.5
+		for i in range(6):
+			var angle := (i + 0.5) * (PI / 3.0)
+			var x := corner_radius * cos(angle)
+			var z := corner_radius * sin(angle)
+			vertices.append(Vector3(x, y, z))
+			
+	var new_shape := ConvexPolygonShape3D.new()
+	new_shape.points = vertices
+	return new_shape
+"
 
 [node name="Node3D" type="Node3D" unique_id=1234296527]
 script = ExtResource("1_khich")
@@ -45,13 +99,13 @@ instance_shader_parameters/outline_color_3 = Color(0, 0, 0, 0)
 instance_shader_parameters/outline_color_4 = Color(0, 0, 0, 0)
 instance_shader_parameters/outline_color_5 = Color(0, 0, 0, 0)
 instance_shader_parameters/overlay_color = Color(0, 0, 0, 0)
-mesh = SubResource("ArrayMesh_2guvj")
+mesh = SubResource("ArrayMesh_0hfuy")
 script = ExtResource("3_0hfuy")
 metadata/_custom_type_script = "uid://dnvr04fclhup8"
 
 [node name="Area3D" type="Area3D" parent="." unique_id=1971132589]
 
 [node name="HexShape3D" type="CollisionShape3D" parent="Area3D" unique_id=2122824615]
-shape = SubResource("ConvexPolygonShape3D_jaa0m")
-script = ExtResource("2_slqgy")
+shape = SubResource("ConvexPolygonShape3D_ao1v8")
+script = SubResource("GDScript_2guvj")
 metadata/_custom_type_script = "uid://cbo3qipknide"
