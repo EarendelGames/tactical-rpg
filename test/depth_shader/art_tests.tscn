@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ecwh8j651v5m" path="res://script/camera_simple.gd" id="1_f6sct"]
 [ext_resource type="Script" uid="uid://ddseljb64e3vt" path="res://compositor_effects/highlight_outline_environment.gd" id="2_f6sct"]
+[ext_resource type="PackedScene" uid="uid://buek7qxa703vl" path="res://model/block/outlined_rock.glb" id="3_gxpsk"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_f6sct"]
 
@@ -46,7 +47,7 @@ transform = Transform3D(-1, 0, 8.742278e-08, 6.985106e-08, 0.601327, 0.799003, -
 script = ExtResource("1_f6sct")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=491425755]
-transform = Transform3D(-2.1321028e-08, 0.87297314, -0.48776826, 3.8158866e-08, 0.48776826, 0.87297314, 1, 0, -4.3711385e-08, -2.0137758, 2.2157712, 0.032955647)
+transform = Transform3D(-0.07163671, 0.87073034, -0.48651513, 3.815887e-08, 0.48776835, 0.8729733, 0.99743074, 0.062536895, -0.03494215, -3.1878693, 2.2157712, -0.95508343)
 
 [node name="Objects" type="Node3D" parent="." unique_id=678218958]
 transform = Transform3D(0.006245762, 0.18490607, -0.9827364, -0.22428498, 0.95797646, 0.17882195, 0.9745036, 0.2192961, 0.04745494, 1.7871277, 0, 0)
@@ -113,3 +114,21 @@ environment = SubResource("Environment_f6sct")
 script = ExtResource("2_f6sct")
 highlight_color = Color(3.4461616e-05, 0.49719512, 0.9079379, 0.8745098)
 metadata/_custom_type_script = "uid://ddseljb64e3vt"
+
+[node name="outlined_rock" parent="." unique_id=1577326674 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.40161934, 0, 0.2628724, 0, 0.48, 0, -0.2628724, 0, 0.40161934, 0.086698055, 0, 1.7198045)
+
+[node name="outlined_rock4" parent="." unique_id=259392984 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(-0.38967782, 0, -0.28026983, 0, 0.47999996, 0, 0.28026983, 0, -0.38967782, 0.28051886, 0.31483388, 2.7437491)
+
+[node name="outlined_rock5" parent="." unique_id=322802996 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(-0.38967782, 0, -0.28026983, 0, 0.47999996, 0, 0.28026983, 0, -0.38967782, -0.2842923, 0.31483388, 3.1779158)
+
+[node name="outlined_rock6" parent="." unique_id=2061904369 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(-0.38967782, 0, -0.28026983, 0, 0.47999996, 0, 0.28026983, 0, -0.38967782, 0.19978419, 0.3557204, 3.3237321)
+
+[node name="outlined_rock2" parent="." unique_id=1878551138 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.268179, -0.011989665, 0.3979149, 0.0068362216, -0.47957283, -0.019057546, 0.3980369, 0.016314704, -0.26776955, 0.5749937, 0.30974913, 1.8450937)
+
+[node name="outlined_rock3" parent="." unique_id=326695650 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.39204344, 0.016574401, -0.2764547, 0.0068362197, -0.47957277, -0.019057544, -0.27686673, 0.011628015, -0.39193064, 0.9125402, 0.7402858, 2.3063226)
