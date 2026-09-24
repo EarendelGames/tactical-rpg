@@ -21,6 +21,16 @@ class_name CuboidMesh3D extends ArrayMesh
 		flip_faces = value
 		_request_rebuild()
 
+@export var flip_normals: bool = false:
+	set(value):
+		flip_normals = value
+		_request_rebuild()
+
+@export var material: Material = null:
+	set(value):
+		material = value
+		_request_rebuild()
+	
 const AXES := [Vector3.RIGHT, Vector3.LEFT, Vector3.UP, Vector3.DOWN, Vector3.BACK, Vector3.FORWARD]
 
 var _vertices := PackedVector3Array()
@@ -96,13 +106,15 @@ func _rebuild_mesh() -> void:
 	arrays[Mesh.ARRAY_NORMAL] = _normals
 	arrays[Mesh.ARRAY_INDEX] = _indices
 	add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	
+	surface_set_material(0, material)
 
 # Every vertex is center + normal * radius. The grid is laid out so that d(i) x d(j) = -normal.
 func _add_patch(rows: int, cols: int, centers: PackedVector3Array, normals: PackedVector3Array, radius: float, has_pole: bool) -> void:
 	var base := _vertices.size()
 	for k in centers.size():
 		_vertices.append(centers[k] + normals[k] * radius)
-		_normals.append(-normals[k] if flip_faces else normals[k])
+		_normals.append(-normals[k] if flip_normals else normals[k])
 
 	for i in rows - 1:
 		for j in cols - 1:

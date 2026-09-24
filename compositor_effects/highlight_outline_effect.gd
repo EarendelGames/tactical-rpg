@@ -17,7 +17,7 @@ var base_texture_rd = null
 #$WorldEnvironment.compositor.compositor_effects[1].highlighted_texture_rd = RenderingServer.texture_get_rd_texture($SubViewportHighlight.get_texture())
 var highlighted_texture_rd = null
 
-@export var outline_size := 2.0;
+@export var outline_size := 4.0;
 @export var depth_difference_multiplier := 1.0;
 @export var outline_color := Color(1.0, 1.0, 1.0, 1.0)
 @export var highlight_color := Color(0.0, 0.396, 0.769, 0.761)

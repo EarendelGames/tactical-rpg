@@ -79,10 +79,8 @@ void main() {
 	for (float x = -sample_size; x <= sample_size; x++) {
 		for (float y = -sample_size; y <= sample_size; y++) {
 			float sample_length = length(vec2(x, y));
-			float outline_weight = clamp((float(sample_size) - sample_length) * 0.5, 0.0, 1.0);
-			if (outline_weight <= 0.0)
+			if (sample_length > sample_size)
 				continue;
-			
 			vec2 offset_uv = uv_normalized + vec2(x, y) / size + offset;
 
 			float offset_highlight_depth = texture(highlight_depth_texture, offset_uv).a;
@@ -92,14 +90,20 @@ void main() {
 				highlight_depth_border = max(highlight_depth_border, clamp(-10.0 * (sample_length * 0.1 - depth_difference), 0.0, 1.0));
 			}
 
+			//float offset_dark_depth = texture(base_depth_texture, offset_uv).a;
+			//offset_dark_depth = to_linear_depth(offset_dark_depth, offset_uv);
+			//if (base_depth < offset_dark_depth){
+			//	float depth_difference = params.depth_difference_multiplier * (offset_dark_depth - base_depth);
+			//	dark_depth_border = max(dark_depth_border, clamp(10.0 * depth_difference - sample_length, 0.0, 1.0));
+			//}
+
 			float offset_dark_depth = texture(base_depth_texture, offset_uv).a;
 			offset_dark_depth = to_linear_depth(offset_dark_depth, offset_uv);
 			if (base_depth < offset_dark_depth){
 				float depth_difference = params.depth_difference_multiplier * (offset_dark_depth - base_depth);
 				vec3 normal_offset = normal_roughness_compatibility(texture(normal_texture, offset_uv)).rgb;
 				float normal_difference = length(normal_offset - normal_fixed) * 0.5;
-				dark_depth_border = max(dark_depth_border, outline_weight * clamp(10.0 * depth_difference + 5.0 * pow(normal_difference, 0.5) - sample_length, 0.0, 1.0));
-
+				dark_depth_border = max(dark_depth_border, clamp(10.0 * depth_difference + 5.0 * pow(normal_difference, 0.5) - sample_length, 0.0, 1.0));
 				if (highlight_depth < offset_highlight_depth){
 					highlight_depth_border = max(highlight_depth_border, clamp(10.0 * depth_difference + 5.0 * pow(normal_difference, 0.5) - sample_length, 0.0, 1.0));
 				}

@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://cp0fe0qvis1pm"
+path="res://.godot/imported/highlight_outline_with_dark.glsl-ba98e4c46091fc79bdeaf25c752b018c.res"
+
+[deps]
+
+source_file="res://compositor_effects/highlight_outline_with_dark.glsl"
+dest_files=["res://.godot/imported/highlight_outline_with_dark.glsl-ba98e4c46091fc79bdeaf25c752b018c.res"]
+
+[params]
+
