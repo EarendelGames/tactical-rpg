@@ -61,6 +61,10 @@ debug_change_cursor_mode={
 ]
 }
 
+[rendering]
+
+anti_aliasing/quality/screen_space_aa=1
+
 [shader_globals]
 
 mask_pass_active={

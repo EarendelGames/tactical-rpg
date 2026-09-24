@@ -3,10 +3,10 @@
 [ext_resource type="Script" uid="uid://ecwh8j651v5m" path="res://script/camera_simple.gd" id="1_f6sct"]
 [ext_resource type="Script" uid="uid://ddseljb64e3vt" path="res://compositor_effects/highlight_outline_environment.gd" id="2_f6sct"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_gvdj5"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_f6sct"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_jb4b8"]
-material = SubResource("ShaderMaterial_gvdj5")
+material = SubResource("ShaderMaterial_f6sct")
 size = Vector2(5.37, 3.995)
 
 [sub_resource type="Gradient" id="Gradient_f6sct"]
@@ -37,6 +37,7 @@ size = Vector2(5.37, 3.995)
 material = SubResource("ShaderMaterial_u61p0")
 
 [sub_resource type="Environment" id="Environment_f6sct"]
+ssao_enabled = true
 
 [node name="ArtTests" type="Node3D" unique_id=1098943654]
 

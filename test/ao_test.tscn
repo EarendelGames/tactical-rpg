@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://yow4gux5udyy"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_igmn8"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_r3dj0"]
+sky_material = SubResource("ProceduralSkyMaterial_igmn8")
+
+[sub_resource type="Environment" id="Environment_4pvsl"]
+background_mode = 2
+sky = SubResource("Sky_r3dj0")
+tonemap_mode = 2
+ssao_radius = 0.4
+ssao_intensity = 4.46
+ssao_light_affect = 1.0
+ssao_ao_channel_affect = 1.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_tw1lo"]
+size = Vector2(5.37, 3.995)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_15vu6"]
+
+[node name="AoTest" type="Node3D" unique_id=2119372161]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=196784022]
+fov = 37.849285
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2028367349]
+environment = SubResource("Environment_4pvsl")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1543101269]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=966335274]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("PlaneMesh_tw1lo")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MeshInstance3D" unique_id=893941705]
+mesh = SubResource("CapsuleMesh_15vu6")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="MeshInstance3D" unique_id=462045876]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.005117059, -0.26092082, -0.4232683)
+mesh = SubResource("CapsuleMesh_15vu6")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="MeshInstance3D" unique_id=1530305627]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6038864, 0, 0)
+mesh = SubResource("CapsuleMesh_15vu6")
