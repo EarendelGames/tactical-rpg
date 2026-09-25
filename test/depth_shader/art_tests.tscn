@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://ecwh8j651v5m" path="res://script/camera_simple.gd" id="1_f6sct"]
 [ext_resource type="Script" uid="uid://ddseljb64e3vt" path="res://compositor_effects/highlight_outline_environment.gd" id="2_f6sct"]
+[ext_resource type="Shader" uid="uid://dmcdmnsfli4n7" path="res://shader/uv_shift.gdshader" id="2_nrt3s"]
+[ext_resource type="Texture2D" uid="uid://c2jjefmltqtge" path="res://textures/stonework.png" id="3_cyt5r"]
 [ext_resource type="PackedScene" uid="uid://buek7qxa703vl" path="res://model/block/outlined_rock.glb" id="3_gxpsk"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_f6sct"]
@@ -9,6 +11,33 @@
 [sub_resource type="PlaneMesh" id="PlaneMesh_jb4b8"]
 material = SubResource("ShaderMaterial_f6sct")
 size = Vector2(5.37, 3.995)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_cyt5r"]
+load_path = "res://.godot/imported/stonework.png-6c6e18ff0d3710fc683b0ea89991e9e5.s3tc.ctex"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nonyp"]
+render_priority = 0
+shader = ExtResource("2_nrt3s")
+shader_parameter/albedo_texture = SubResource("CompressedTexture2D_cyt5r")
+shader_parameter/tint = Color(0.68, 0.6369333, 0.544, 1)
+shader_parameter/uv_offset = Vector2(0.98, 0.32)
+shader_parameter/uv_scale = Vector2(0.645, 0.825)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ku5ib"]
+material = SubResource("ShaderMaterial_nonyp")
+size = Vector2(5.425, 5.855)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cyt5r"]
+render_priority = 0
+shader = ExtResource("2_nrt3s")
+shader_parameter/albedo_texture = ExtResource("3_cyt5r")
+shader_parameter/tint = Color(0.68, 0.63908666, 0.5508, 1)
+shader_parameter/uv_offset = Vector2(0.68, 0.32)
+shader_parameter/uv_scale = Vector2(0.645, 0.825)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_nonyp"]
+material = SubResource("ShaderMaterial_cyt5r")
+size = Vector2(5.425, 5.855)
 
 [sub_resource type="Gradient" id="Gradient_f6sct"]
 offsets = PackedFloat32Array(0.3292011, 0.5027548)
@@ -43,7 +72,8 @@ ssao_enabled = true
 [node name="ArtTests" type="Node3D" unique_id=1098943654]
 
 [node name="MainCamera" type="Camera3D" parent="." unique_id=1733807163]
-transform = Transform3D(-1, 0, 8.742278e-08, 6.985106e-08, 0.601327, 0.799003, -5.2569675e-08, 0.799003, -0.601327, 0, 4.4258413, -2.5929396)
+transform = Transform3D(-1, 2.262668e-08, 8.444391e-08, 6.985106e-08, 0.78763443, 0.61614275, -5.2569675e-08, 0.61614275, -0.78763443, 0, 7.262933, -6.9302816)
+fov = 45.0
 script = ExtResource("1_f6sct")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=491425755]
@@ -55,6 +85,21 @@ transform = Transform3D(0.006245762, 0.18490607, -0.9827364, -0.22428498, 0.9579
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Objects" unique_id=1784836238]
 transform = Transform3D(0.0062457547, -0.22428498, 0.9745036, 0.18490607, 0.9579766, 0.21929613, -0.9827363, 0.17882195, 0.047454946, -0.0025259582, -0.36733726, 1.7493899)
 mesh = SubResource("PlaneMesh_jb4b8")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D13" type="MeshInstance3D" parent="Objects" unique_id=6711871]
+transform = Transform3D(0.0062457407, -0.22428498, 0.9745036, 0.1849061, 0.9579766, 0.21929616, -0.9827363, 0.17882195, 0.047454953, 2.4924703, 0.6514139, -0.5789)
+mesh = SubResource("PlaneMesh_jb4b8")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D12" type="MeshInstance3D" parent="Objects" unique_id=1666127537]
+transform = Transform3D(-0.40437275, -0.8866673, -0.22428505, 0.07546865, -0.27674097, 0.9579766, -0.9114752, 0.37045312, 0.17882195, 3.127938, -0.080038935, -3.0544481)
+mesh = SubResource("PlaneMesh_ku5ib")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D14" type="MeshInstance3D" parent="Objects" unique_id=1510304337]
+transform = Transform3D(0.0062456583, -0.9745037, -0.22428508, 0.18490614, -0.21929617, 0.9579766, -0.9827363, -0.047454983, 0.17882195, 3.9705868, -0.3182799, -0.7486404)
+mesh = SubResource("PlaneMesh_nonyp")
 skeleton = NodePath("../..")
 
 [node name="MeshInstance3D8" type="MeshInstance3D" parent="Objects" unique_id=2100437014]
@@ -115,20 +160,59 @@ script = ExtResource("2_f6sct")
 highlight_color = Color(3.4461616e-05, 0.49719512, 0.9079379, 0.8745098)
 metadata/_custom_type_script = "uid://ddseljb64e3vt"
 
-[node name="outlined_rock" parent="." unique_id=1577326674 instance=ExtResource("3_gxpsk")]
-transform = Transform3D(0.40161934, 0, 0.2628724, 0, 0.48, 0, -0.2628724, 0, 0.40161934, 0.086698055, 0, 1.7198045)
+[node name="outlined_rock" parent="." unique_id=1209790960 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.44066185, 0, 0.19030799, 0, 0.48, 0, -0.19030799, 0, 0.44066185, 6.4425387, -0.54583794, 0.85456896)
 
-[node name="outlined_rock4" parent="." unique_id=259392984 instance=ExtResource("3_gxpsk")]
-transform = Transform3D(-0.38967782, 0, -0.28026983, 0, 0.47999996, 0, 0.28026983, 0, -0.38967782, 0.28051886, 0.31483388, 2.7437491)
+[node name="outlined_rock4" parent="." unique_id=57021927 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(-0.4318718, 0, -0.20949152, 0, 0.48000002, 0, 0.20949152, 0, -0.4318718, 5.9861965, -0.8595794, 2.108328)
 
-[node name="outlined_rock5" parent="." unique_id=322802996 instance=ExtResource("3_gxpsk")]
-transform = Transform3D(-0.38967782, 0, -0.28026983, 0, 0.47999996, 0, 0.28026983, 0, -0.38967782, -0.2842923, 0.31483388, 3.1779158)
+[node name="outlined_rock5" parent="." unique_id=773903036 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(-0.4318718, 0, -0.20949152, 0, 0.48000002, 0, 0.20949152, 0, -0.4318718, 5.2942967, -0.44970226, 2.3376071)
 
-[node name="outlined_rock6" parent="." unique_id=2061904369 instance=ExtResource("3_gxpsk")]
-transform = Transform3D(-0.38967782, 0, -0.28026983, 0, 0.47999996, 0, 0.28026983, 0, -0.38967782, 0.19978419, 0.3557204, 3.3237321)
+[node name="outlined_rock16" parent="." unique_id=198331259 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(-0.46112746, 0, -0.13327202, 0, 0.29656237, 0, 0.13327202, 0, -0.46112746, 5.7999587, 0.78567505, 2.9326916)
 
-[node name="outlined_rock2" parent="." unique_id=1878551138 instance=ExtResource("3_gxpsk")]
-transform = Transform3D(0.268179, -0.011989665, 0.3979149, 0.0068362216, -0.47957283, -0.019057546, 0.3980369, 0.016314704, -0.26776955, 0.5749937, 0.30974913, 1.8450937)
+[node name="outlined_rock6" parent="." unique_id=1667547921 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(-0.4318718, 0, -0.20949152, 0, 0.48000002, 0, 0.20949152, 0, -0.4318718, 6.6241097, -0.43084088, 2.339638)
 
-[node name="outlined_rock3" parent="." unique_id=326695650 instance=ExtResource("3_gxpsk")]
-transform = Transform3D(0.39204344, 0.016574401, -0.2764547, 0.0068362197, -0.47957277, -0.019057544, -0.27686673, 0.011628015, -0.39193064, 0.9125402, 0.7402858, 2.3063226)
+[node name="outlined_rock14" parent="." unique_id=1638507377 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(-0.3954571, 0, -0.15891114, 0, 0.3641071, 0, 0.19182754, 0, -0.32759914, 3.870949, 0.33832592, 3.6394482)
+
+[node name="outlined_rock9" parent="." unique_id=626390594 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.0018670633, 0.0036193358, -0.29766145, -6.793761e-05, 0.29766732, 0.0036189805, 0.29768345, 4.5234043e-05, 0.0018677472, 2.3066952, 1.3512168, 3.961571)
+
+[node name="outlined_rock12" parent="." unique_id=596845337 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.002240554, 0.004343354, -0.35720617, -8.152797e-05, 0.35721323, 0.0043429276, 0.35723257, 5.428274e-05, 0.0022413747, 0.6629129, 1.3013382, 3.9596555)
+
+[node name="outlined_rock17" parent="." unique_id=720496154 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.13348219, 0.0015597837, -0.3741329, 0.0042328513, 0.35695148, 0.0041772216, 0.30752492, -0.0055902037, 0.16233616, 3.817172, 1.4450744, 3.5171413)
+
+[node name="outlined_rock10" parent="." unique_id=1921978631 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.0005385134, -0.0036188513, 0.2976668, -6.79376e-05, 0.29766732, 0.0036189803, -0.29768878, -7.447962e-05, 0.00053765206, 1.7288582, 1.4521571, 3.9280117)
+
+[node name="outlined_rock11" parent="." unique_id=758413205 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(-0.00658944, 0.029542278, 0.23255557, 0.29768965, 0.0069726044, 0.0049169916, -0.0043253247, 0.4348818, -0.01587674, 1.2265086, 1.532541, 3.714028)
+
+[node name="outlined_rock13" parent="." unique_id=1998457149 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(-0.0037883327, 0.036394287, 0.30987972, -0.17114462, -0.008589777, -0.006551882, 0.0024866557, -0.53574777, 0.021155722, 0.02106008, 1.5092899, 4.2059383)
+
+[node name="outlined_rock7" parent="." unique_id=536097189 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.11185501, 0, -0.30059233, 0, 0.32072937, 0, 0.30059233, 0, 0.11185501, 2.9412215, 0.7331311, 3.8742237)
+
+[node name="outlined_rock8" parent="." unique_id=2087667913 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.3176321, 0, 0.030010356, 0, 0.32072937, 0, -0.044465065, 0, 0.21437624, 2.8366756, 1.3526893, 3.9243705)
+
+[node name="outlined_rock18" parent="." unique_id=1358726523 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.28638434, 0, 0.09745827, 0, 0.23820707, 0, -0.14439976, 0, 0.19328651, 3.2247894, 1.3870013, 3.834116)
+
+[node name="outlined_rock19" parent="." unique_id=363595316 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.28638434, 0, 0.09745827, 0, 0.23820707, 0, -0.14439976, 0, 0.19328651, 4.31614, 1.4730563, 3.3219423)
+
+[node name="outlined_rock15" parent="." unique_id=1164185575 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.3749224, 0, 0.035423227, 0, 0.39278853, 0, -0.052485086, 0, 0.25304258, 2.8135371, -0.033931077, 3.9276097)
+
+[node name="outlined_rock2" parent="." unique_id=923085220 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.1961492, -0.014603381, 0.43784958, 0.0068362206, -0.47957283, -0.019057546, 0.43803978, 0.014023652, -0.1957666, 6.568418, -0.16342849, 1.4331532)
+
+[node name="outlined_rock3" parent="." unique_id=934419695 instance=ExtResource("3_gxpsk")]
+transform = Transform3D(0.4336206, 0.014341375, -0.20534725, 0.006836218, -0.4795727, -0.019057542, -0.20573395, 0.014291476, -0.43343893, 6.8309445, -0.024250329, 1.714029)

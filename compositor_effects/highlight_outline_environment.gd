@@ -27,6 +27,7 @@ func _ready() -> void:
 			for i in range(1, 21):
 				sub_camera.set_cull_mask_value(i, false)
 			sub_camera.set_cull_mask_value(HighlightOutlineEnvironment.highlight_layer, true)
+		sub_camera.fov = main_camera.fov
 		
 		subview.add_child(sub_camera)
 		var remote := RemoteTransform3D.new()

@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://c4smlc3qftcyj"]
+
+[ext_resource type="Texture2D" uid="uid://3a27kkrlndkv" path="res://model/block/outlined_rock_block_1.png" id="1_lidtp"]
+
+[resource]
+resource_name = "Material"
+cull_mode = 2
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.66492164, 0.66492164, 0.6649216, 1)
+albedo_texture = ExtResource("1_lidtp")
