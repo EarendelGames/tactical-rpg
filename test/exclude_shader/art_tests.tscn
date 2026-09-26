@@ -1,14 +1,11 @@
 [gd_scene format=3 uid="uid://0xscwlcji0ll"]
 
-[ext_resource type="Script" path="res://test/exclude_shader/main.gd" id="1_ratju"]
 [ext_resource type="Script" uid="uid://ecwh8j651v5m" path="res://script/camera_simple.gd" id="2_6u06u"]
 [ext_resource type="Shader" uid="uid://c480mkb87rr4a" path="res://test/exclude_shader/exclude_test.gdshader" id="3_b8pg1"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gvdj5"]
 render_priority = 0
 shader = ExtResource("3_b8pg1")
-shader_parameter/albedo_color = Color(0.75, 0.75, 0.78, 1)
-shader_parameter/roughness_value = 0.4
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_jb4b8"]
 material = SubResource("ShaderMaterial_gvdj5")
@@ -18,7 +15,7 @@ size = Vector2(5.37, 3.995)
 render_priority = 1
 transparency = 1
 shading_mode = 0
-albedo_color = Color(0, 0, 0.31764707, 1)
+albedo_color = Color(0, 0, 0, 1)
 grow = true
 grow_amount = 0.041
 stencil_mode = 3
@@ -70,14 +67,11 @@ material = SubResource("StandardMaterial3D_3u1a1")
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_u61p0"]
 render_priority = 0
 shader = ExtResource("3_b8pg1")
-shader_parameter/albedo_color = Color(0.75, 0.75, 0.78, 1)
-shader_parameter/roughness_value = 0.4
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_q4k0y"]
 material = SubResource("ShaderMaterial_u61p0")
 
 [node name="ArtTests" type="Node3D" unique_id=1098943654]
-script = ExtResource("1_ratju")
 
 [node name="MainCamera" type="Camera3D" parent="." unique_id=1733807163]
 transform = Transform3D(-1, 0, 8.742278e-08, 6.985106e-08, 0.601327, 0.799003, -5.2569675e-08, 0.799003, -0.601327, 0, 4.4258413, -2.5929396)
